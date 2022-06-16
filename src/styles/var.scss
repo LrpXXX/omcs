@@ -1,0 +1,86 @@
+$listWitdh: 5, 10, 15, 20, 25, 30, 50, 100;
+$listMarginPadding: 2, 3, 5, 8, 10, 12, 14, 15, 16, 18, 20, 24, 25, 30, 32, 40;
+$display: block, inline, inline-block, flex, none;
+$justifyContent: flex-start, flex-end, center, space-between, space-around;
+$alignItems: flex-start, flex-end, center, baseline, stretch;
+$flexDirection: row, row-reverse, column, column-reverse;
+
+// 主题色
+$color-primary: #ea663e;
+
+@each $item in $listWitdh {
+  .w#{$item} {
+    width: #{$item}+ "%";
+  }
+}
+
+@each $item in $listMarginPadding {
+  /* margin 外边距 */
+  .ml-#{$item} {
+    margin-left: #{$item}px;
+  }
+
+  .mr-#{$item} {
+    margin-right: #{$item}px;
+  }
+
+  .mt-#{$item} {
+    margin-top: #{$item}px;
+  }
+
+  .mb-#{$item} {
+    margin-bottom: #{$item}px;
+  }
+
+  /* padding 内边距 */
+  .pl-#{$item} {
+    padding-left: #{$item}px;
+  }
+
+  .pr-#{$item} {
+    padding-right: #{$item}px;
+  }
+
+  .pt-#{$item} {
+    padding-top: #{$item}px;
+  }
+
+  .pb-#{$item} {
+    padding-bottom: #{$item}px;
+  }
+}
+
+@each $item in $display {
+  .#{$item} {
+    display: #{$item};
+  }
+}
+
+@each $item in $justifyContent {
+  .jc-#{$item} {
+    justify-content: #{$item};
+  }
+}
+
+@each $item in $alignItems {
+  .ai-#{$item} {
+    align-items: #{$item};
+  }
+}
+
+@each $item in $flexDirection {
+  .fd-#{$item} {
+    flex-direction: #{$item};
+  }
+}
+
+@for $i from 1 through 5 {
+  .ellipsis-#{$i} {
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: #{$i};
+    overflow: hidden;
+    word-break: break-all;
+  }
+}

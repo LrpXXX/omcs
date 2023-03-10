@@ -34,6 +34,7 @@ axios.interceptors.request.use(
 let needLogin = false; //单独针对登录进行拦截，避免页面提示多次 ’请重新登录‘；
 axios.interceptors.response.use(
   (res) => {
+    console.log(res);
     const code = res.data.code;
     // code === 0请求成功
     if (code === 0) {

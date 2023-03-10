@@ -4,7 +4,7 @@
     <el-aside :width="asiderWidth" class="layout-aside">
       <!-- 系统logo标识 -->
       <div class="logo-wrap">
-        <p class="title">数智可视化站台</p>
+        <p class="title">柳汽智慧场管理平台</p>
       </div>
       <!-- 菜单 -->
       <layout-menu />

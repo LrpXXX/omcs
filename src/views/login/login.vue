@@ -7,16 +7,16 @@
 
       <div class="login-content">
         <div class="login-logo">
-          <p>数智可视化站台</p>
+          <p>柳汽智慧场管理平台</p>
         </div>
         <el-form class="login-form-wrap" :model="loginForm" :rules="rules" ref="loginFormRef">
-          <el-form-item prop="uname" class="ipt-item">
-            <el-input v-model="loginForm.uname" placeholder="请输入手机号码">
+          <el-form-item prop="account" class="ipt-item">
+            <el-input v-model="loginForm.account" placeholder="请输入用户名">
               <i slot="prefix" class="el-input__icon el-icon-mobile"></i>
             </el-input>
           </el-form-item>
-          <el-form-item prop="pwd" class="ipt-item">
-            <el-input v-model="loginForm.pwd" type="password" placeholder="请输入登录密码">
+          <el-form-item prop="password" class="ipt-item">
+            <el-input v-model="loginForm.password" type="password" placeholder="请输入登录密码">
               <i slot="prefix" class="el-input__icon el-icon-lock"></i>
             </el-input>
           </el-form-item>
@@ -30,7 +30,6 @@
 </template>
 
 <script>
-import md5 from "js-md5";
 import loginApi from "@/service/api/login/index";
 import auth from "@/common/auth";
 import { resetRouter } from "@/router/index";
@@ -40,12 +39,12 @@ export default {
     return {
       loading: false,
       loginForm: {
-        uname: "",
-        pwd: "",
+        account: "",
+        password: "",
       },
       rules: {
-        uname: [{ required: true, message: "请输入手机号码", trigger: "blur" }],
-        pwd: [{ required: true, message: "请输入登录密码", trigger: "blur" }],
+        account: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+        password: [{ required: true, message: "请输入登录密码", trigger: "blur" }],
       },
     };
   },
@@ -54,20 +53,21 @@ export default {
       this.$refs["loginFormRef"].validate(async (valid) => {
         if (valid) {
           this.loading = true;
-          const { uname, pwd } = this.loginForm;
+          const { account, password } = this.loginForm;
           const params = {
-            uname,
-            pwd: md5(pwd),
+            account,
+            password,
           };
           const res = await loginApi.login(params);
           this.loading = false;
           if (res) {
             // 登录后先重置之前添加的路由，避免重复
+            console.log(res);
             resetRouter();
 
-            auth.setToken(res.accessToken);
+            auth.setToken(res.token);
             auth.setUserInfo(res);
-            this.$store.commit("SETUSERINFO", res);
+            this.$store.commit("SETUSERINFO", res.menus);
             const toPath = decodeURIComponent(this.$route.query.redirect || "/");
             this.$router.replace(toPath);
           }

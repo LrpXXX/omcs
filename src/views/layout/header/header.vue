@@ -2,9 +2,9 @@
   <div class="layout-header">
     <div class="left-options flex ai-center">
       <!-- 展开收起按钮 -->
-      <!-- <span class="menu-fold" @click="change">
+      <span class="menu-fold" @click="change">
         <i :class="collapsed ? 'el-icon-s-unfold' : 'el-icon-s-fold'" />
-      </span> -->
+      </span>
 
       <!-- 面包屑 -->
       <el-breadcrumb separator="/">

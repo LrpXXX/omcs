@@ -1,3 +1,5 @@
+<!-- eslint-disable no-unused-vars -->
+<!-- eslint-disable no-unused-vars -->
 <template>
   <div>
     <common-table
@@ -112,6 +114,7 @@ export default {
             width: "",
             align: "center",
             sortable: false,
+            // eslint-disable-next-line no-unused-vars
             ownDefinedReturn: (row, $index) => {
               return row.address;
             },
@@ -158,6 +161,7 @@ export default {
                 label: "编辑",
                 icon: "",
                 // color: "red",
+                // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
                   return true;
                 },
@@ -168,6 +172,7 @@ export default {
                 label: "删除",
                 icon: "",
                 // color: "blue",
+                // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
                   return true;
                 },
@@ -178,6 +183,7 @@ export default {
                 label: "查看",
                 icon: "",
                 color: "",
+                // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
                   return true;
                 },

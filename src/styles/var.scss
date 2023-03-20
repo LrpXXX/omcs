@@ -7,6 +7,7 @@ $flexDirection: row, row-reverse, column, column-reverse;
 
 // 主题色
 $color-primary: #ea663e;
+$color-bacgroun:#494442;
 
 @each $item in $listWitdh {
   .w#{$item} {

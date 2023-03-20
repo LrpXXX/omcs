@@ -94,7 +94,7 @@ export function resetRouter() {
 // 路由守卫
 router.beforeEach((to, from, next) => {
   nprogress.start();
-
+  console.log(to.matched);
   // 路由守卫判断
   if (!to.matched.length) {
     next("/404");
@@ -102,12 +102,13 @@ router.beforeEach((to, from, next) => {
     next();
   } else {
     // 获取token
-    const token = auth.getToken();
-    if (token) {
-      hasLogin({ router, to, next });
-    } else {
-      next("/login");
-    }
+    // const token = auth.getToken();
+    // if (token) {
+    //   hasLogin({ router, to, next });
+    // } else {
+    //   next("/login");
+    // }
+    next()
   }
 });
 

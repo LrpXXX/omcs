@@ -1,7 +1,7 @@
 <template>
   <div class="page-404">
     <div>
-      <h1 class="mb-30">404 页面不存在</h1>
+      <h1 class="mb-30">404 页面不存在或正在开发中</h1>
       <router-link to="/" replace class="">返回首页</router-link>
     </div>
   </div>

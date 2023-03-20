@@ -10,7 +10,7 @@
       unique-opened
       collapse-transition
       mode="vertical"
-      background-color="#334761"
+      background-color="#494442"
       text-color="rgba(255, 255, 255, 0.65)"
       active-text-color="#ffffff"
       class="aside-menu"
@@ -77,7 +77,7 @@ export default {
         .el-menu-item {
           height: 40px;
           line-height: 40px;
-          background: #2f3d56 !important;
+          background:$color-bacgroun !important;
           &.is-active {
             background: $color-primary !important;
           }

@@ -60,6 +60,7 @@ import {
   MessageBox,
   Message,
   Notification,
+  Result
 } from "element-ui";
 
 Vue.use(Pagination);
@@ -118,6 +119,7 @@ Vue.use(Footer);
 Vue.use(Divider);
 Vue.use(Image);
 Vue.use(Calendar);
+Vue.use(Result)
 Vue.use(Loading);
 
 Vue.prototype.$loading = Loading.service;

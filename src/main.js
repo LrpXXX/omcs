@@ -8,8 +8,10 @@ import store from "./store/index";
 import http from "./service/http";
 // 挂载自定义指令
 import directive from "@/common/directives";
-// import ws from "./common/websocket";
-
+// 挂载websoket
+import ws from "./common/websocket";
+// 挂入全局工具方法
+import tools from '@/service/zdk/tools';
 // 导入全局过滤器
 import * as filters from "@/common/filters";
 
@@ -25,9 +27,8 @@ Vue.prototype.$http = http;
 Vue.config.productionTip = false;
 
 Vue.use(directive);
-
-// Vue.use(ws);
-// ws.createWebsocket();
+Vue.prototype.$t = tools
+Vue.use(ws);
 
 console.log(window.WebVideoCtrl);
 

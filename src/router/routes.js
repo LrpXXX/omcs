@@ -53,7 +53,7 @@ export const staticRoutes = [
         path: "/monitor/coalTemperature",
         component: CoalTemperature,
         meta: {
-          title: "煤温报警检测",
+          title: "高温报警检测",
           roles: [],
         },
       },
@@ -72,6 +72,66 @@ export const staticRoutes = [
         component: () => import(/* webpackChunck 'userInfo' */ "@/views/system/user-info.vue"),
         meta: {
           title: "个人中心",
+          roles: [],
+        },
+      },
+      {
+        path: "/system/userInfoLsit",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/system/userInfolist.vue"),
+        meta: {
+          title: "预约列表",
+          roles: [],
+        },
+      },
+    ],
+  },
+  {
+    path: "/personnel",
+    redirect: "/personnel/personnle",
+    component: Layout,
+    meta: {
+      title: "人员管理",
+    },
+    children: [
+      {
+        path: "/personnel/personnel",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/personnel/personnelList.vue"),
+        meta: {
+          title: "驾驶人员",
+          roles: [],
+        },
+      },
+      {
+        path: "/yardman/yardmanList",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/personnel/yardmanList.vue"),
+        meta: {
+          title: "场地人员",
+          roles: [],
+        },
+      },
+    ],
+  },
+  {
+    path: "/site",
+    redirect: "/site/siteList",
+    component: Layout,
+    meta: {
+      title: "场地管理",
+    },
+    children: [
+      {
+        path: "/site/siteList",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/site/siteList.vue"),
+        meta: {
+          title: "场地管理",
+          roles: [],
+        },
+      },
+      {
+        path: "/site/cinema",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/site/cinema.vue"),
+        meta: {
+          title: "包场",
           roles: [],
         },
       },

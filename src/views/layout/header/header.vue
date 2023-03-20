@@ -2,26 +2,26 @@
   <div class="layout-header">
     <div class="left-options flex ai-center">
       <!-- 展开收起按钮 -->
-      <span class="menu-fold" @click="change">
+      <!-- <span class="menu-fold" @click="change">
         <i :class="collapsed ? 'el-icon-s-unfold' : 'el-icon-s-fold'" />
-      </span>
-
+      </span> -->
       <!-- 面包屑 -->
-      <el-breadcrumb separator="/">
+      <!-- <el-breadcrumb separator="/">
         <transition-group name="breadcrumb">
           <el-breadcrumb-item v-for="(item, index) in menuList" :key="item.path">
             <span v-if="index === menuList.length - 1">{{ item.meta.title }}</span>
             <a v-else @click.prevent="onLink(item)">{{ item.meta.title }}</a>
           </el-breadcrumb-item>
         </transition-group>
-      </el-breadcrumb>
+      </el-breadcrumb> -->
+      <sider-mean class="sider"></sider-mean>
     </div>
 
     <!-- 右侧操作区域 -->
     <ul class="right-options flex ai-center">
       <li class="mr-30 cursor">
         <i class="el-icon-user mr-5"></i>
-        <span @click="toUserInfo">{{ userInfo.name || "" }}</span>
+        <span @click="toUserInfo">{{ userInfo.name || "默认" }}</span>
       </li>
       <li class="cursor">
         <i class="el-icon-switch-button mr-5"></i>
@@ -34,8 +34,11 @@
 <script>
 import index from "../path-compile.js";
 import auth from "@/common/auth";
+import siderMean from '../menu/siderMean.vue';
 
 export default {
+  components: { siderMean },
+
   name: "layoutHeader",
   mixins: [index],
   props: {
@@ -96,8 +99,10 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #ffffff;
+  background: #444447;
   box-shadow: 0px 1px 4px 0px rgba(0, 21, 41, 0.12);
+  color: aliceblue;
+  .left-options{}
   .menu-fold {
     padding: 0 24px 0 0;
     cursor: pointer;

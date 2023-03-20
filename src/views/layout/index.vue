@@ -17,7 +17,17 @@
       </el-header>
 
       <!-- 全局实时监控滚动组件 -->
-      <realtime-monitor />
+      <div class="breadcrumb">
+        <el-breadcrumb separator="/">
+        <transition-group name="breadcrumb">
+          <el-breadcrumb-item v-for="(item, index) in menuList" :key="item.path">
+            <span v-if="index === menuList.length - 1">{{ item.meta.title }}</span>
+            <a v-else @click.prevent="onLink(item)">{{ item.meta.title }}</a>
+          </el-breadcrumb-item>
+        </transition-group>
+      </el-breadcrumb>
+      </div>
+       
 
       <!-- 子页面容器 -->
       <el-main>
@@ -30,18 +40,16 @@
 <script>
 import menu from "./menu/menu.vue";
 import header from "./header/header.vue";
-import realtimeMonitor from "./realtime-monitor/index.vue";
-
 export default {
   name: "layout",
   components: {
     "layout-menu": menu,
     "layout-header": header,
-    "realtime-monitor": realtimeMonitor,
   },
   data() {
     return {
       isCollapse: false,
+      menuList: []
     };
   },
   computed: {
@@ -49,25 +57,40 @@ export default {
       return this.isCollapse ? "54px" : "208px";
     },
   },
+  created() {
+    // 进入页面获取一次面包屑
+    this.getBreadcrumb();
+  },
   methods: {
+    // 获取面包屑信息
+    getBreadcrumb() {
+      const matched = this.$route.matched.filter((item) => item.meta && item.meta.title);
+      this.menuList = matched.filter((item) => item.meta && item.meta.title && !item.meta.breadcrumb && item.name !== "layout");
+    },
     onChange() {
       this.isCollapse = !this.isCollapse;
     },
   },
+  watch:{
+      // 路由改变，更新面包屑
+      $route() {
+      this.getBreadcrumb();
+    },
+  }
 };
 </script>
 
 <style scoped lang="scss">
 .layout-container {
-  min-width: 1440px;
   height: 100%;
-  overflow: hidden;
-  background: #f0f2f5;
+  overflow: auto;
+  background: $color-bacgroun !important;
   .layout-aside {
     height: 100vh;
     transition: all 0.3s;
-    background-color: #334761;
+    background-color: $color-bacgroun !important;
     overflow: hidden;
+    width: 200px;
     .logo-wrap {
       height: 50px;
       line-height: 50px;
@@ -85,8 +108,15 @@ export default {
   .layout-header-wrapper {
     padding: 0;
   }
+  .breadcrumb{
+    background: #ffffff;
+    font-size: 24px;
+    height: 50px;
+    line-height: 50px;
+    padding-top:20px
+  }
   .el-main {
-    margin: 15px;
+    margin: 0;
     padding: 0;
     background: #ffffff;
     border-radius: 4px;

@@ -4,7 +4,7 @@
 
 const Layout = () => import("@/views/layout/index.vue"),
   Login = () => import("@/views/login/login.vue"),
-  NotFound = () => import("@/views/error/404.vue")
+  NotFound = () => import("@/views/error/404.vue");
 
 // 任何角色都能访问的静态路由
 export const staticRoutes = [
@@ -57,7 +57,7 @@ export const staticRoutes = [
   //   ],
   // },
   {
-    path: "/system",
+    path: "/",
     redirect: "/system/userInfo",
     component: Layout,
     meta: {
@@ -154,6 +154,14 @@ export const staticRoutes = [
         component: () => import(/* webpackChunck 'userInfo' */ "@/views/issue/interPhone.vue"),
         meta: {
           title: "对讲机管理",
+          roles: [],
+        },
+      },
+      {
+        path: "/issue/interPhoneList",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/issue/interPhoneList.vue"),
+        meta: {
+          title: "对讲机归还记录",
           roles: [],
         },
       },

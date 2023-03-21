@@ -49,34 +49,43 @@
     </el-dialog>
     <!-- 发放通行卡 -->
     <el-dialog title="发放通行证" :visible.sync="openVisible">
-      <el-form :model="openFrom" :rules="openRul" ref="openFrom" label-width="100px">
+      <el-form :model="openFrom" :rules="openRul" ref="openFrom" label-width="150px">
         <el-form-item label="通行卡ID" prop="rfid">
           <el-input v-model="openFrom.rfid" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="车辆类型" prop="carType">
+          <el-select v-model="openFrom.carType" placeholder="请选择车辆类型">
+            <el-option label="试验样车" value="试验样车"></el-option>
+            <el-option label="巡检车辆" value="巡检车辆"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="发放车辆" prop="fhcar">
+          <el-input v-model="openFrom.fhcar"></el-input>
+        </el-form-item>
+        <el-form-item label="车辆VIN/底盘号" prop="carVIM">
+          <el-input v-model="openFrom.carVIM"></el-input>
+        </el-form-item>
+        <el-form-item label="客户名称" prop="khName">
+          <el-input v-model="openFrom.khName"></el-input>
+        </el-form-item>
+        <el-form-item label="领用人员" prop="lyName">
+          <el-input v-model="openFrom.khName"></el-input>
         </el-form-item>
         <el-form-item label="联系电话" prop="tel">
           <el-input v-model="openFrom.tel"></el-input>
         </el-form-item>
-        <el-form-item label="车辆类型" prop="carType">
-          <el-select v-model="openFrom.carType" placeholder="请选择活动区域" default-first-option="其他">
-            <el-option label="保洁" value="保洁"></el-option>
-            <el-option label="维修" value="维修"></el-option>
-            <el-option label="管理" value="管理"></el-option>
-            <el-option label="服务保障" value="服务保障"></el-option>
-            <el-option label="场地维护" value="场地维护"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="备注" prop="desc">
-          <el-input type="textarea" v-model="openFrom.desc"></el-input>
+        <el-form-item label="发放时间" prop="time">
+          <el-date-picker v-model="openFrom.time" type="datetime" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('openFrom')">确定</el-button>
           <el-button @click="resetForm('openFrom')">取消</el-button>
+          <el-button type="primary" @click="submitForm('openFrom')">确定</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
     <!-- 回收通行卡 -->
     <el-dialog title="收回通行证" :visible.sync="closeVisible">
-      <el-form :model="closeFrom" :rules="closeRul" label-width="150px">
+      <el-form :model="closeFrom" :rules="closeRul" ref="sureFrom" label-width="150px">
         <el-form-item label="归还类型" prop="type">
           <el-radio-group v-model="closeFrom.type">
             <el-radio label="实验结束"></el-radio>
@@ -84,8 +93,8 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item>
-          <el-button @click="claer">取消</el-button>
-          <el-button type="primary" @click="sure">确定</el-button>
+          <el-button @click="claer('sureFrom')">取消</el-button>
+          <el-button type="primary" @click="sure('sureFrom')">确定</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -263,15 +272,18 @@ export default {
       closeVisible: false,
       openVisible: false,
       openFrom: {},
-      openRul: {},
+      openRul: {
+        carType: [{ required: true, message: "请选择车辆类型", trigger: "change" }],
+        fhcar: [{ required: true, message: "请选择归还类型", trigger: "change" }],
+        lyName: [{ required: true, message: "请选择归还类型", trigger: "blur" }],
+      },
     };
   },
   methods: {
     // 操作列
     rowOperation(row, $index, now) {
-      console.log(now, row);
       switch (now) {
-        case "eidtOpen":
+        case "editOpen":
           this.openVisible = true;
           break;
         case "eidtClose":
@@ -310,20 +322,28 @@ export default {
       this.idFrom[fromName].resetFields();
       this.dialogFormVisible = false;
     },
-    sure() {
+    sure(formName) {
       console.log("确定归还吗？");
-      this.closeVisible = false;
+      this.$refs[formName].validate().then((res) => {
+        if (res) {
+          this.$refs[formName].resetFields();
+          this.closeVisible = false;
+        }
+      });
     },
-    claer() {
+    claer(fromName) {
+      this.$refs[fromName].resetFields();
       this.closeVisible = false;
     },
     // 发放数据
-    submitForm(fromName){
-        console.log(fromName);
+    submitForm(fromName) {
+      console.log(fromName);
+      this.openVisible = false;
     },
-    resetForm(fromName){
-        console.log(fromName);
-    }
+    resetForm(fromName) {
+      console.log(fromName);
+      this.openVisible = false;
+    },
   },
 };
 </script>

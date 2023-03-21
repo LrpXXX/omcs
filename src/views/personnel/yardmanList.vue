@@ -23,7 +23,7 @@
         <el-form-item>
           <el-button type="primary" @click="onSuReg">重置</el-button>
         </el-form-item>
-        <el-form-item>
+        <el-form-item style="float: right;">
           <el-button type="primary" @click="onSubAdd">新增</el-button>
         </el-form-item>
       </el-form>
@@ -103,9 +103,6 @@ export default {
         tel:undefined,
         region:''
       },
-      serchName:'',
-      serchTel:undefined,
-      serchregion:'',
       face: {},
       faceDlog: false,
       dialogFormVisible: false,
@@ -250,10 +247,10 @@ export default {
           break;
         case "edit":
           this.dialogFormVisible = true;
-          this.ruleForm = row;
+          this.ruleForm = JSON.parse(JSON.stringify(row));
           break;
         case "delete":
-          this.tableData = this.tableData.filter((item) => item.id !== row.id);
+          this.tableData = [...this.tableData.filter((item) => item.id !== row.id)];
           Message.success("删除成功");
           break;
         default:
@@ -291,6 +288,7 @@ export default {
       console.log(fromName);
       this.$refs[fromName].validate().then((res) => {
         if (res) {
+          console.log(this.ruleForm);
           if (this.ruleForm.id !== undefined) {
             for (const item in this.tableData) {
               if (this.tableData[item].id === this.ruleForm.id) {

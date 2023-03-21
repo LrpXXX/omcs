@@ -396,12 +396,12 @@ export default {
       console.log(row, now);
       switch (now) {
         case "edit":
-          this.eidtFrom = row;
+          this.eidtFrom = JSON.parse(JSON.stringify(row));
           this.dialogFormVisible = true;
           break;
         case "":
           this.dialogRlVisible = true;
-          this.rlFrom = row;
+          this.rlFrom = JSON.parse(JSON.stringify(row));
           break;
         case "see":
           break;
@@ -446,6 +446,29 @@ export default {
       this.$refs[fromName].validate().then((res) => {
         console.log(res);
         console.log(this.eidtFrom);
+        if(res){
+          if(this.eidtFrom.id!==undefined){
+           const index= this.tableData.findIndex(item=>item.id===this.eidtFrom.id)
+           console.log(index,'index');
+            this.$set(this.tableData,index,this.eidtFrom)
+            this.tableData=JSON.parse(JSON.stringify(this.tableData))
+          }else{
+            this.tableData.push(        {
+          id: this.tableData.length+1,
+          cdname: this.eidtFrom.cdname,
+          iscine: this.eidtFrom.iscine,
+          cineType: this.eidtFrom.iscine?'已包场':'未包场',
+          timem: this.eidtFrom.jfms,
+          cddj: this.eidtFrom.cddj,
+          cdrl: this.eidtFrom.cdrl,
+          dqrl: undefined,
+          fctt: this.eidtFrom.fctt,
+          daoz: "",
+          zt: "",
+          beizhu: this.eidtFrom.desc
+        },)
+          }
+        }
         this.dialogFormVisible = false;
       });
     },

@@ -79,7 +79,7 @@ module.exports = defineConfig({
   },
   // webpack-dev-server 相关配置
   devServer: {
-    port: 8080, // 端口号
+    port: 8000, // 端口号
     https: false, // https:{type:Boolean}
     open: false, //配置自动启动浏览器
     // proxy: {

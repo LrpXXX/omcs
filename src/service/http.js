@@ -2,30 +2,30 @@ import axios from "axios";
 import { Message, MessageBox } from "element-ui";
 import router from "@/router/index";
 import auth from "@/common/auth";
+import { getUTCTime } from "./zdk/timeTime";
 
 // 设置请求头和请求路径
-axios.defaults.baseURL = process.env.VUE_APP_URL;
+axios.defaults.baseURL = "http://10.130.81.40:9871/system";
 axios.defaults.timeout = 60000;
 axios.defaults.headers.post["Content-Type"] = "application/json;charset=UTF-8";
-
+// token是否过期
+function isTokenExpire(serverTokenExpire) {
+  return getUTCTime(new Date()) >= serverTokenExpire * 1;
+}
+// 相应设置token
 axios.interceptors.request.use(
   (config) => {
+    console.log(config);
     // 自定义headers
-    const accesstoken = auth.getToken();
-    if (config.headers && accesstoken) {
-      config.headers.accesstoken = accesstoken;
+    const interceptor = auth.getToken();
+    console.log(interceptor);
+    if (config.headers && interceptor) {
+      config.headers.Authorization = interceptor;
     }
-
-    // 添加系统级参数
-    // config.data = {
-    //   appId: '',
-    //   sign: '',
-    //   timestamp: '',
-    //   data: { ...config.data },
-    // };
     return config;
   },
   (error) => {
+    console.log(error);
     return error;
   }
 );
@@ -34,31 +34,28 @@ axios.interceptors.request.use(
 let needLogin = false; //单独针对登录进行拦截，避免页面提示多次 ’请重新登录‘；
 axios.interceptors.response.use(
   (res) => {
-    console.log(res);
-    const code = res.data.code;
     // code === 0请求成功
-    if (code === 0) {
-      return Promise.resolve(res.data);
-    } else {
-      // token失效，重新登录
-      if (code === 20 && !needLogin) {
-        needLogin = true;
-        MessageBox.confirm("登录信息过期，请重新登录。", "提示", {
-          closeOnClickModal: false,
-          confirmButtonText: "确定",
-          type: "warning",
-          showClose: false,
-          showCancelButton: false,
-        }).then(() => {
-          auth.removeToken();
-          router.replace(`/login?redirect=${encodeURIComponent(router.currentRoute.fullPath)}`);
-        });
-      }
-      if (!needLogin) {
-        Message.error(res.data && res.data.msg);
-      }
-      // return Promise.reject(res);
-    }
+    // if (code === 200) {
+    //   return Promise.resolve(res.data);
+    // } else {
+    //   // token失效，重新登录
+    //   if (code === 20 && !needLogin) {
+    //     needLogin = true;
+    //     MessageBox.confirm("登录信息过期，请重新登录。", "提示", {
+    //       closeOnClickModal: false,
+    //       confirmButtonText: "确定",
+    //       type: "warning",
+    //       showClose: false,
+    //       showCancelButton: false,
+    //     }).then(() => {
+    //       auth.removeToken();
+    //       router.replace(`/login?redirect=${encodeURIComponent(router.currentRoute.fullPath)}`);
+    //     });
+    //   }
+    //   if (!needLogin) {
+    //     Message.error(res.data && res.data.msg);
+    //   }
+    return Promise.reject(res);
   },
   (error) => {
     // if (error.message.indexOf('timeout') !== -1) {
@@ -69,7 +66,6 @@ axios.interceptors.response.use(
     //   console.log('请求资源未找到，请稍后再试');
     //   return;
     // }
-    // console.log('请求出错');
     return Promise.reject(error);
   }
 );

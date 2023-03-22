@@ -1,6 +1,19 @@
 <template>
   <div>
     <el-form v-model="formInline" :inline="true">
+      <el-form-item label="设备编号" prop="sbID">
+        <el-input v-model.trim="formInline.sbID" placeholder="设备编号"></el-input>
+      </el-form-item>
+      <el-form-item label="类型" prop="type">
+        <el-select v-model.trim="formInline.type" placeholder="选择类型">
+          <el-option label="全部" value="全部"></el-option>
+          <el-option label="发放" value="发放"></el-option>
+          <el-option label="收回" value="收回"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="领用/归还人员" prop="lyname">
+        <el-input v-model.trim="formInline.lyname" placeholder="模糊匹配领用或归还人员"></el-input>
+      </el-form-item>
       <el-form-item label="时间" prop="time">
         <el-date-picker
           v-model="formInline.time"
@@ -12,16 +25,6 @@
           end-placeholder="结束日期"
           :picker-options="pickerOptions"
         ></el-date-picker>
-      </el-form-item>
-      <el-form-item label="类型" prop="type">
-        <el-select v-model.trim="formInline.type" placeholder="选择类型">
-          <el-option label="全部" value="全部"></el-option>
-          <el-option label="发放" value="发放"></el-option>
-          <el-option label="收回" value="收回"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="领用/归还人员" prop="lyname">
-        <el-input v-model.trim="formInline.lyname" placeholder="模糊匹配领用或归还人员"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSerch">搜索</el-button>
@@ -96,16 +99,22 @@ export default {
         ],
       },
       tableData: [
-        { zdId: "1002", time: "2015-09-31  15:31:02", type: "发放", name: "刘强", tel: 15736288040, khName: "中国长安" },
-        { zdId: "1002", time: "2015-09-31  15:31:02", type: "发放", name: "", tel: undefined, khName: "中国汽研" },
-        { zdId: "1003", time: "2018-09-31  15:31:02", type: "收回", name: "", tel: undefined, khName: "lims" },
+        { zdId: "1002",sbId:'tx2023001', time: "2015-09-31  15:31:02", type: "发放", name: "刘强", tel: 15736288040, khName: "中国长安" },
+        { zdId: "1002",sbId:'tx2023002', time: "2015-09-31  15:31:02", type: "发放", name: "", tel: undefined, khName: "中国汽研" },
+        { zdId: "1003", sbId:'tx2023003',time: "2018-09-31  15:31:02", type: "收回", name: "", tel: undefined, khName: "lims" },
       ],
       columObj: {
         columnData: [
           {
             text: true,
             prop: "zdId",
-            label: "设备编号",
+            label: "终端编号",
+            align: "center",
+          },
+          {
+            text: true,
+            prop: "sbId",
+            label: "设备Id",
             align: "center",
           },
           {
@@ -152,7 +161,7 @@ export default {
       console.log("搜索条件清空");
     },
     goBack() {
-      this.$router.push("/issue/interPhone");
+      this.$router.push("/issue/devcise");
     },
     excl(){
       console.log('导出excl文件');

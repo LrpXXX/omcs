@@ -2,7 +2,7 @@
 export const VUEXKEY = "SMART_VISUAL_VUEX";
 
 const prefix = "SMART_VISUAL_",
-  TOKEN = `${prefix}TOKEN`,
+  TOKEN = `accessToken`,
   LANG = `${prefix}LANG`,
   COMPANYINFO = `${prefix}COMPANYINFO`,
   MENUINFO = `${prefix}MENUINFO`,

@@ -7,8 +7,8 @@
       <el-form-item label="发放状态" prop="ffzt">
         <el-select v-model.trim="formInline.ffzt" placeholder="发放状态">
           <el-option label="全部" value="全部"></el-option>
-          <el-option label="已发送" value="维修"></el-option>
-          <el-option label="未发送" value="管理"></el-option>
+          <el-option label="已发送" value="已发送"></el-option>
+          <el-option label="未发送" value="未发送"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="车辆类型" prop="region">
@@ -69,7 +69,7 @@
           <el-input v-model="openFrom.khName"></el-input>
         </el-form-item>
         <el-form-item label="领用人员" prop="lyName">
-          <el-input v-model="openFrom.khName"></el-input>
+          <el-input v-model="openFrom.lyName"></el-input>
         </el-form-item>
         <el-form-item label="联系电话" prop="tel">
           <el-input v-model="openFrom.tel"></el-input>
@@ -319,7 +319,7 @@ export default {
       });
     },
     exitFrom(fromName) {
-      this.idFrom[fromName].resetFields();
+      // this.idFrom[fromName].resetFields();
       this.dialogFormVisible = false;
     },
     sure(formName) {

@@ -50,29 +50,30 @@ export default {
   },
   methods: {
     onLogin() {
-      this.$refs["loginFormRef"].validate(async (valid) => {
-        if (valid) {
-          this.loading = true;
-          const { account, password } = this.loginForm;
-          const params = {
-            account,
-            password,
-          };
-          const res = await loginApi.login(params);
-          this.loading = false;
-          if (res) {
-            // 登录后先重置之前添加的路由，避免重复
-            console.log(res);
-            resetRouter();
+      this.$router.push('/')
+      // this.$refs["loginFormRef"].validate(async (valid) => {
+      //   if (valid) {
+      //     this.loading = true;
+      //     const { account, password } = this.loginForm;
+      //     const params = {
+      //       account,
+      //       password,
+      //     };
+      //     const res = await loginApi.login(params);
+      //     this.loading = false;
+      //     if (res) {
+      //       // 登录后先重置之前添加的路由，避免重复
+      //       console.log(res);
+      //       resetRouter();
 
-            auth.setToken(res.token);
-            auth.setUserInfo(res);
-            this.$store.commit("SETUSERINFO", res.menus);
-            const toPath = decodeURIComponent(this.$route.query.redirect || "/");
-            this.$router.replace(toPath);
-          }
-        }
-      });
+      //       auth.setToken(res.token);
+      //       auth.setUserInfo(res);
+      //       this.$store.commit("SETUSERINFO", res.menus);
+      //       const toPath = decodeURIComponent(this.$route.query.redirect || "/");
+      //       this.$router.replace(toPath);
+      //     }
+      //   }
+      // });
     },
   },
 };

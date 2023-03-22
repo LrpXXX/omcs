@@ -249,9 +249,26 @@ export default {
           this.dialogFormVisible = true;
           this.ruleForm = JSON.parse(JSON.stringify(row));
           break;
-        case "delete":
-          this.tableData = [...this.tableData.filter((item) => item.id !== row.id)];
-          Message.success("删除成功");
+        case "delete":  
+          this.$confirm('是否删除该条数据？', '确认信息', {
+          distinguishCancelAndClose: true,
+          confirmButtonText: '确认',
+          cancelButtonText: '取消'
+        })
+          .then(() => {
+            this.tableData = [...this.tableData.filter((item) => item.id !== row.id)];
+            this.$message({
+              type:'success',
+              message: '删除成功'
+            });
+          })
+          .catch(action => {
+            this.$message({
+              message: action === 'cancel'
+                ? '放弃保存并离开页面'
+                : '停留在当前页面'
+            })
+          });
           break;
         default:
           break;

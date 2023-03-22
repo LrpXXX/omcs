@@ -7,8 +7,8 @@
       <el-form-item label="发放状态" prop="ffzt">
         <el-select v-model.trim="formInline.ffzt" placeholder="发放状态">
           <el-option label="全部" value="全部"></el-option>
-          <el-option label="已发放" value="维修"></el-option>
-          <el-option label="未发放" value="管理"></el-option>
+          <el-option label="已发放" value="已发放"></el-option>
+          <el-option label="未发放" value="未发放"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="领用人员" prop="lyname">

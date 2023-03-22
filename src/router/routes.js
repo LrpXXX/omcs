@@ -4,8 +4,8 @@
 
 const Layout = () => import("@/views/layout/index.vue"),
   Login = () => import("@/views/login/login.vue"),
-  NotFound = () => import("@/views/error/404.vue");
-
+  NotFound = () => import("@/views/error/404.vue"),
+  Forget=()=>import("@/views/login/forget.vue")
 // 任何角色都能访问的静态路由
 export const staticRoutes = [
   // {
@@ -161,7 +161,7 @@ export const staticRoutes = [
         path: "/issue/interPhoneList",
         component: () => import(/* webpackChunck 'userInfo' */ "@/views/issue/interPhoneList.vue"),
         meta: {
-          title: "对讲机归还记录",
+          title: "对讲机记录",
           roles: [],
         },
       },
@@ -170,6 +170,47 @@ export const staticRoutes = [
         component: () => import(/* webpackChunck 'userInfo' */ "@/views/issue/devcise.vue"),
         meta: {
           title: "定位设备管理",
+          roles: [],
+        },
+      },
+      {
+        path: "/issue/devciseList",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/issue/devciseList.vue"),
+        meta: {
+          title: "固定设备记录",
+          roles: [],
+        },
+      },
+    ],
+  },
+  {
+    path: "/car",
+    component: Layout,
+    meta: {
+      title: "车辆管理",
+    },
+    children: [
+      {
+        path: "/car/inspection",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/car/inspection/inspection.vue"),
+        meta: {
+          title: "巡检车辆",
+          roles: [],
+        },
+      },
+      {
+        path: "/car/sample",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/car/sample/sample.vue"),
+        meta: {
+          title: "样车管理",
+          roles: [],
+        },
+      },
+      {
+        path: "/car/cartype",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/car/cartype"),
+        meta: {
+          title: "车辆类型",
           roles: [],
         },
       },
@@ -183,6 +224,22 @@ export const staticRoutes = [
       hidden: true,
     },
   },
+  {
+    path: "/forget",
+    component: Forget,
+    meta: {
+      title: "忘记密码",
+      hidden: true,
+    },
+  },{
+    path: "/editPassword",
+    component: Forget,
+    meta: {
+      title: "修改密码",
+      hidden: true,
+    },
+  },
+
   {
     path: "/404",
     component: NotFound,

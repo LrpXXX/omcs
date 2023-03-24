@@ -5,7 +5,7 @@ import auth from "@/common/auth";
 import { getUTCTime } from "./zdk/timeTime";
 
 // 设置请求头和请求路径
-axios.defaults.baseURL = "http://10.130.81.40:9871/system";
+axios.defaults.baseURL = "http://10.130.81.37:9871/system";
 axios.defaults.timeout = 60000;
 axios.defaults.headers.post["Content-Type"] = "application/json;charset=UTF-8";
 // token是否过期
@@ -15,17 +15,15 @@ function isTokenExpire(serverTokenExpire) {
 // 相应设置token
 axios.interceptors.request.use(
   (config) => {
-    console.log(config);
     // 自定义headers
     const interceptor = auth.getToken();
-    console.log(interceptor);
     if (config.headers && interceptor) {
       config.headers.Authorization = interceptor;
     }
     return config;
   },
   (error) => {
-    console.log(error);
+
     return error;
   }
 );

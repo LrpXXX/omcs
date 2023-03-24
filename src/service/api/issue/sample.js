@@ -7,5 +7,9 @@ export const Sample={
     // 获取样车状态
     getStates(){
         return http.get('/system/sys-code/getSampleStates').then(res=>res).catch(err=>err)
+    },
+    // 送还样添加信息
+    recodsAdd(data){
+            return  http.post('/system/sm-sample/add',data).then(res=>res).catch(err=>err)
     }
 }

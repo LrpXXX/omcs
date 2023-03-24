@@ -207,6 +207,22 @@ export const staticRoutes = [
         },
       },
       {
+        path: "/car/recpectRecod",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/car/sample/recpectRecod.vue"),
+        meta: {
+          title: "收样",
+          roles: [],
+        },
+      },
+      {
+        path: "/car/returnRecod",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/car/sample/returnRecod.vue"),
+        meta: {
+          title: "还样",
+          roles: [],
+        },
+      },
+      {
         path: "/car/cartype",
         component: () => import(/* webpackChunck 'userInfo' */ "@/views/car/cartype"),
         meta: {

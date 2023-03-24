@@ -90,33 +90,6 @@ export default {
     return {
       formInline: {},
       tableData: [
-        {
-          vehicleName: "1002",
-          vehicleNumber: "tx2023001",
-          time: "2015-09-31  15:31:02",
-          patrolType: "发放",
-          contactPerson: "刘强",
-          contactNumber: 15736288040,
-          khName: "中国长安",
-        },
-        {
-          vehicleName: "1002",
-          vehicleNumber: "tx2023002",
-          time: "2015-09-31  15:31:02",
-          patrolType: "发放",
-          contactPerson: "",
-          contactNumber: undefined,
-          khName: "中国汽研",
-        },
-        {
-          vehicleName: "1003",
-          vehicleNumber: "tx2023003",
-          time: "2018-09-31  15:31:02",
-          patrolType: "收回",
-          contactPerson: "",
-          contactNumber: undefined,
-          khName: "lims",
-        },
       ],
       columObj: {
         columnData: [
@@ -214,7 +187,7 @@ export default {
       openRul: {},
       roluesVisible: false,
       // authe: ["直线性能路", "制动评价路", "NVH评价路", "噪声路", "强化坏路", "坡道路", "动态圆广场A", "动态圆广场B"],
-      auth:[],
+      authe:[],
       value: "",
       checkedAuthe: ["直线性能路线"],
       vehicleId:'',
@@ -319,6 +292,8 @@ export default {
         .then((res) => {
           if (res.code === 200) {
             this.tableData = res.data.records;
+            const time=`${res.data.records.timeStart}-${res.data.records.timeEnd}`
+            this.$set(this.tableData,'time',time)
           }
         })
         .catch((err) => {

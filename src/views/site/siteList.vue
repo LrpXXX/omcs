@@ -85,6 +85,7 @@
 
 <script>
 import commonTable from "@/components/common-table/index.vue";
+import { Site } from "@/service/api/site/site"; 
 export default {
   components: {
     commonTable,
@@ -109,146 +110,33 @@ export default {
       },
       dialogFormVisible: false,
       dialogRlVisible: false,
-      tableData: [
-        {
-          id: 1,
-          cdname: "直线性能路",
-          iscine: "是",
-          cineType: "已包场",
-          timem: "按时长",
-          cddj: "一级",
-          cdrl: 10,
-          dqrl: 0,
-          fctt: "已封场",
-          daoz: "",
-          zt: "启用",
-          beizhu: "",
-        },
-        {
-          id: 2,
-          cdname: "制动评价路",
-          iscine: "是",
-          cineType: "未包场",
-          timem: "",
-          cddj: "",
-          cdrl: 5,
-          dqrl: 0,
-          fctt: "未封场",
-          daoz: "",
-          zt: "启用",
-          beizhu: "",
-        },
-        {
-          id: 3,
-          cdname: "NVH评价路",
-          iscine: "是",
-          cineType: "",
-          timem: "",
-          cddj: "",
-          cdrl: 10,
-          dqrl: 0,
-          fctt: "未封场",
-          daoz: "",
-          zt: "启用",
-          beizhu: "",
-        },
-        {
-          id: 4,
-          cdname: "噪声路",
-          iscine: "是",
-          cineType: "",
-          timem: "",
-          cddj: "",
-          cdrl: 10,
-          dqrl: 0,
-          fctt: "未封场",
-          daoz: "",
-          zt: "禁用",
-          beizhu: "",
-        },
-        {
-          id: 5,
-          cdname: "强化环路",
-          iscine: "否",
-          cineType: "",
-          timem: "",
-          cddj: "",
-          cdrl: 15,
-          dqrl: 0,
-          fctt: "未封场",
-          daoz: "",
-          zt: "禁用",
-          beizhu: "",
-        },
-        {
-          id: 6,
-          cdname: "坡道",
-          iscine: undefined,
-          cineType: "",
-          timem: "",
-          cddj: "",
-          cdrl: 12,
-          dqrl: 0,
-          fctt: "未封场",
-          daoz: "",
-          zt: "",
-          beizhu: "",
-        },
-        {
-          id: 7,
-          cdname: "动态圆广场A",
-          iscine: undefined,
-          cineType: "",
-          timem: "",
-          cddj: "",
-          cdrl: 11,
-          dqrl: 0,
-          fctt: "未封场",
-          daoz: "",
-          zt: "",
-          beizhu: "",
-        },
-        {
-          id: 8,
-          cdname: "动态圆广场B",
-          iscine: undefined,
-          cineType: "",
-          timem: "",
-          cddj: "",
-          cdrl: "场地容量",
-          dqrl: 0,
-          fctt: "未封场",
-          daoz: "",
-          zt: "",
-          beizhu: "",
-        },
-      ],
+      tableData: [],
       columObj: {
         columnData: [
           {
             text: true,
-            prop: "cdname",
+            prop: "siteName",
             label: "场地名称",
             align: "center",
             width: "150",
           },
           {
             text: true,
-            prop: "iscine",
+            prop: "blockBooking",
             label: "支持包场",
             align: "center",
             width: "300",
           },
           {
             text: true,
-            prop: "cineType",
+            prop: "blockState",
             label: "包场状态",
             align: "center",
             width: "150",
           },
           {
             text: true,
-            prop: "timem",
+            prop: "billingMode",
             label: "计费模式",
             width: "300",
             align: "center",
@@ -256,28 +144,28 @@ export default {
 
           {
             text: true,
-            prop: "cddj",
+            prop: "siteLevel",
             label: "场地等级",
             width: "200",
             align: "center",
           },
           {
             text: true,
-            prop: "cdrl",
+            prop: "siteCapacity",
             label: "场地容量",
             width: "200",
             align: "center",
           },
           {
             text: true,
-            prop: "dqrl",
+            prop: "currentCapacity",
             label: "当前容量",
             width: "200",
             align: "center",
           },
           {
             text: true,
-            prop: "fctt",
+            prop: "closeState",
             label: "封场状态",
             width: "200",
             align: "center",
@@ -291,8 +179,14 @@ export default {
           },
           {
             text: true,
-            prop: "zt",
+            prop: "flag",
             label: "状态",
+            width: "200",
+            align: "center",
+          },  {
+            text: true,
+            prop: "remark",
+            label: "备注",
             width: "200",
             align: "center",
           },
@@ -476,7 +370,24 @@ export default {
     resetForm(fromName) {
       this.dialogFormVisible = false;
     },
+    // 查询场地数据
+    getSiteLsit(){
+      Site.getList().then(res=>{
+        if(res.code===200){
+          this.tableData=res.data.map(item=>{
+            item.blockBooking===1?item.blockBooking='是':item.blockBooking='否'
+            item.blockState===0?item.blockState='未包场':item.blockState='已包场'
+            item.closeState===0?item.closeState='未封场':item.closeState='已封场'
+            item.flag===0?item.flag='启用':item.flag='禁用'
+            return   item
+          })
+        }
+      }).catch(err=>{console.log(err);})
+    }
   },
+  created(){
+    this.getSiteLsit()
+  }
 };
 </script>
 

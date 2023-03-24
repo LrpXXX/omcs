@@ -7,11 +7,11 @@
           <el-option v-for="item in selecTion" :key="item.id" :label="item.codeText" :value="item.codeValue"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="样车编号" prop="carCode">
-        <el-input v-model.trim="formInline.carcode" placeholder="样车编号"></el-input>
+      <el-form-item label="预约单号" prop="bookingNumber">
+        <el-input v-model.trim="formInline.bookingNumber" placeholder="预约编号"></el-input>
       </el-form-item>
-      <el-form-item label="车辆VIM/底盘号" prop="lyname">
-        <el-input v-model.trim="formInline.lyname" placeholder="联系人"></el-input>
+      <el-form-item label="车辆VIM/底盘号" prop="vinOrClassicNumber">
+        <el-input v-model.trim="formInline.vinOrClassicNumber" placeholder="车辆VIM/底盘号"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSerch">查询</el-button>
@@ -102,7 +102,8 @@ export default {
                 // color: "red",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
-                  return true;
+                  // return row.sampleState==='待送样';
+                  return true
                 },
               },
               {
@@ -112,13 +113,14 @@ export default {
                 // color: "red",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
-                  return true;
+                  // return row.sampleState==='试验中';
+                  return true
                 },
               },
               {
-                operation: "delete",
+                operation: "Syjl",
                 type: "text",
-                label: "删除",
+                label: "收样记录",
                 // color: "red",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
@@ -126,9 +128,9 @@ export default {
                 },
               },
               {
-                operation: "edit",
+                operation: "Hyjl",
                 type: "text",
-                label: "编辑",
+                label: "还样记录",
                 // color: "red",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
@@ -136,9 +138,9 @@ export default {
                 },
               },
               {
-                operation: "sexj",
+                operation: "ewm",
                 type: "text",
-                label: "巡检记录",
+                label: "二维码打印",
                 // color: "red",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
@@ -158,10 +160,34 @@ export default {
     };
   },
   methods: {
-    onSerch() {},
-    onSuReg() {},
+    // 搜索数据
+    onSerch() {
+      console.log(this.formInline);
+      let sampleStates=[]
+      if(this.formInline.type===undefined){
+        sampleStates=this.selecTion.map(item=>item.id)
+      }else{
+        sampleStates=this.selecTion.filter(item=>item.codeValue===this.formInline.type).map(item=>item.id)
+      }
+      console.log(sampleStates);
+      const data={bookingNumber:this.formInline.bookingNumber,pageNum:1,pageSize:10,vinOrClassicNumber:this.formInline.vinOrClassicNumber,sampleStates}
+      this.getSampleList(data)
+    },
+    onSuReg() {
+      this.formInline={}
+    },
     onAdd() {},
-    rowOperation(row, $index, now) {},
+    rowOperation(row, $index, now) {
+      switch(now){
+        case 'seeSy':
+          this.$router.push('/car/recpectRecod')
+          break;
+          case 'seeHy':
+          this.$router.push('/car/returnRecod')
+            break;
+            default: break
+      }
+    },
     // 查询样车状态
     async getStatus() {
       const res = await Sample.getStates();

@@ -91,6 +91,17 @@ const http = {
         });
     });
   },
+  postFrom(url, data, headers) {
+    return new Promise((resolve, reject) => {
+      axios({ method: "post", url, data, headers })
+        .then((res) => {
+          resolve(res.data);
+        })
+        .catch((err) => {
+          reject(err.data);
+        });
+    });
+  },
   upload(url, file) {
     return new Promise((resolve, reject) => {
       axios

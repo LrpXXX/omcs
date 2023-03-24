@@ -17,4 +17,15 @@ export const Site={
         }
         @return   Promise
      */
+    updateFlid(data){
+        return http.post('/system/sm-site/updateField',data).then(res=>res).catch(err=>err)
+    },
+    //根据ID修改数据
+    updateByID(data){
+        return  http.post('/system/sm-site/updateById',data).then(res=>res).catch(err=>err)
+    },
+    // 添加道路数据
+    addSiteLsit(data){
+        return  http.post('/system/sm-site/add',data).then(res=>res).catch(err=>err)
+    }
 }

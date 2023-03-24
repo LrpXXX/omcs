@@ -31,37 +31,76 @@
       @handleCurrentChange="handleCurrentChange"
     ></commonTable>
     <!-- 新增编辑弹窗页面 -->
-    <el-dialog title="新增/编辑场地" :visible.sync="dialogFormVisible">
-      <el-form :model="eidtFrom" :rules="eidtRules" ref="eidtFrom" label-width="100px">
-        <el-form-item label="场地名称" prop="cdname">
-          <el-input v-model="eidtFrom.cdname"></el-input>
+    <el-dialog title="新增场地" :visible.sync="addVisible">
+      <el-form :model="addFrom" :rules="eidtRules" ref="addFrom" label-width="100px">
+        <el-form-item label="场地名称" prop="siteName">
+          <el-input v-model="addFrom.siteName"></el-input>
         </el-form-item>
-        <el-form-item label="场地容量" prop="cdrl">
-          <el-input text="number" v-model="eidtFrom.cdrl"></el-input>
+        <el-form-item label="场地容量" prop="siteCapacity">
+          <el-input text="number" v-model="addFrom.siteCapacity"></el-input>
         </el-form-item>
-        <el-form-item label="场地等级" prop="cddj">
-          <el-radio-group v-model="eidtFrom.cddj">
+        <el-form-item label="场地等级" prop="siteLevel">
+          <el-radio-group v-model="addFrom.siteLevel">
             <el-radio label="一级"></el-radio>
             <el-radio label="二级"></el-radio>
             <el-radio label="三级"></el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="计费模式" prop="jfms">
-          <el-radio-group v-model="eidtFrom.jfms">
-            <el-radio label="时长 "></el-radio>
-            <el-radio label="里程"></el-radio>
-            <el-radio label="次数"></el-radio>
-            <el-radio label="天数"></el-radio>
+        <el-form-item label="计费模式" prop="billingMode">
+          <el-radio-group v-model="addFrom.billingMode">
+            <el-radio label="按时长 "></el-radio>
+            <el-radio label="按里程"></el-radio>
+            <el-radio label="按次数"></el-radio>
+            <el-radio label="按天数"></el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="是否包场" prop="iscine">
-          <el-radio-group v-model="eidtFrom.iscine">
+        <el-form-item label="是否包场" prop="blockBooking">
+          <el-radio-group v-model="addFrom.blockBooking">
             <el-radio label="是"></el-radio>
             <el-radio label="否"></el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="备注" prop="desc">
-          <el-input type="textarea" v-model="eidtFrom.desc"></el-input>
+        <el-form-item label="备注" prop="remark">
+          <el-input type="textarea" v-model="addFrom.remark"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('addFrom')">确定</el-button>
+          <el-button @click="resetForm('addFrom')">取消</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+    <!-- 编辑场地 -->
+    <el-dialog title="编辑场地" :visible.sync="dialogFormVisible">
+      <el-form :model="eidtFrom" :rules="eidtRules" ref="eidtFrom" label-width="100px">
+        <el-form-item label="场地名称" prop="siteName">
+          <el-input v-model="eidtFrom.siteName"></el-input>
+        </el-form-item>
+        <el-form-item label="场地容量" prop="siteCapacity">
+          <el-input text="number" v-model="eidtFrom.siteCapacity"></el-input>
+        </el-form-item>
+        <el-form-item label="场地等级" prop="siteLevel">
+          <el-radio-group v-model="eidtFrom.siteLevel">
+            <el-radio label="一级"></el-radio>
+            <el-radio label="二级"></el-radio>
+            <el-radio label="三级"></el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="计费模式" prop="billingMode">
+          <el-radio-group v-model="eidtFrom.billingMode" disabled>
+            <el-radio label="按时长 "></el-radio>
+            <el-radio label="按里程"></el-radio>
+            <el-radio label="按次数"></el-radio>
+            <el-radio label="按天数"></el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="是否包场" prop="blockBooking">
+          <el-radio-group v-model="eidtFrom.blockBooking">
+            <el-radio label="是" :value="eidtFrom.blockBooking"></el-radio>
+            <el-radio label="否" :value="eidtFrom.blockBooking"></el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input type="textarea" v-model="eidtFrom.remark"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm('eidtFrom')">确定</el-button>
@@ -85,7 +124,9 @@
 
 <script>
 import commonTable from "@/components/common-table/index.vue";
-import { Site } from "@/service/api/site/site"; 
+import { Site } from "@/service/api/site/site";
+import { Message } from "element-ui";
+import { Allasig } from "@/service/api/all";
 export default {
   components: {
     commonTable,
@@ -102,14 +143,16 @@ export default {
         ncdrl: [{ required: true, message: "请输入场地容量", trigger: "blur" }],
       },
       eidtRules: {
-        cdname: [{ required: true, message: "请输入活动名称", trigger: "blur" }],
-        cdrl: [{ required: true, message: "请输入场地容量", trigger: "blur" }],
-        cddj: [{ required: true, message: "请选择场地等级", trigger: "change" }],
-        jfms: [{ required: true, message: "请选择计费模式", trigger: "change" }],
-        iscine: [{ required: true, message: "是否包场", trigger: "change" }],
+        siteName: [{ required: true, message: "请输入活动名称", trigger: "blur" }],
+        siteCapacity: [{ required: true, message: "请输入场地容量", trigger: "blur" }],
+        siteLevel: [{ required: true, message: "请选择场地等级", trigger: "change" }],
+        billingMode: [{ required: true, message: "请选择计费模式", trigger: "change" }],
+        blockBooking: [{ required: true, message: "是否包场", trigger: "change" }],
       },
       dialogFormVisible: false,
       dialogRlVisible: false,
+      addVisible: false,
+      addFrom: {},
       tableData: [],
       columObj: {
         columnData: [
@@ -183,7 +226,8 @@ export default {
             label: "状态",
             width: "200",
             align: "center",
-          },  {
+          },
+          {
             text: true,
             prop: "remark",
             label: "备注",
@@ -279,7 +323,7 @@ export default {
       },
       pageObj: {
         position: "right", //分页组件位置
-        total: 50,
+        total: 10,
         pageIndex: 1,
         pageSize: 10,
       },
@@ -290,6 +334,7 @@ export default {
       console.log(row, now);
       switch (now) {
         case "edit":
+          console.log(row);
           this.eidtFrom = JSON.parse(JSON.stringify(row));
           this.dialogFormVisible = true;
           break;
@@ -327,67 +372,95 @@ export default {
         this.tableData = [...this.tableData];
       }
     },
+    // 重置数据
     onSuReg() {
       this.serchFrom = {};
-      this.tableData = [...this.tableData];
+      this.getSiteLsit();
     },
     // 点击新增弹出模态框
     onSubAdd() {
-      this.dialogFormVisible = true;
+      this.addVisible = true;
     },
     // 获取新增/修改表单是咧
     submitForm(fromName) {
       this.$refs[fromName].validate().then((res) => {
-        console.log(res);
-        console.log(this.eidtFrom);
-        if(res){
-          if(this.eidtFrom.id!==undefined){
-           const index= this.tableData.findIndex(item=>item.id===this.eidtFrom.id)
-           console.log(index,'index');
-            this.$set(this.tableData,index,this.eidtFrom)
-            this.tableData=JSON.parse(JSON.stringify(this.tableData))
-          }else{
-            this.tableData.push(        {
-          id: this.tableData.length+1,
-          cdname: this.eidtFrom.cdname,
-          iscine: this.eidtFrom.iscine,
-          cineType: this.eidtFrom.iscine?'已包场':'未包场',
-          timem: this.eidtFrom.jfms,
-          cddj: this.eidtFrom.cddj,
-          cdrl: this.eidtFrom.cdrl,
-          dqrl: undefined,
-          fctt: this.eidtFrom.fctt,
-          daoz: "",
-          zt: "",
-          beizhu: this.eidtFrom.desc
-        },)
+        if (res) {
+          if (fromName === "addFrom") {
+            console.log("新增呀");
+            const data = {
+              siteName: this.addFrom.siteName,
+              siteCapacity: this.addFrom.siteCapacity,
+              siteLevel: this.addFrom.siteLevel,
+              billingMode: this.addFrom.billingMode,
+              blockBooking: this.addFrom.blockBooking === "是" ? 0 : 1,
+              remark: this.addFrom.remark,
+            };
+            this.addSitelist(data);
+            console.log(data);
+          } else if (fromName === "eidtFrom") {
+            console.log("修改呀");
           }
         }
-        this.dialogFormVisible = false;
       });
     },
     // 清楚新增/修改表单实例
     resetForm(fromName) {
-      this.dialogFormVisible = false;
+      if (fromName === "addfFrom") {
+        this.addVisible = false;
+      } else if (fromName === "editFrom") {
+        this.dialogFormVisible = false;
+      }
     },
     // 查询场地数据
-    getSiteLsit(){
-      Site.getList().then(res=>{
-        if(res.code===200){
-          this.tableData=res.data.map(item=>{
-            item.blockBooking===1?item.blockBooking='是':item.blockBooking='否'
-            item.blockState===0?item.blockState='未包场':item.blockState='已包场'
-            item.closeState===0?item.closeState='未封场':item.closeState='已封场'
-            item.flag===0?item.flag='启用':item.flag='禁用'
-            return   item
-          })
+    getSiteLsit() {
+      Site.getList()
+        .then((res) => {
+          if (res.code === 200) {
+            this.tableData = res.data.map((item) => {
+              item.blockBooking === 1 ? (item.blockBooking = "是") : (item.blockBooking = "否");
+              item.blockState === 0 ? (item.blockState = "未包场") : (item.blockState = "已包场");
+              item.closeState === 0 ? (item.closeState = "未封场") : (item.closeState = "已封场");
+              item.flag === 0 ? (item.flag = "启用") : (item.flag = "禁用");
+              return item;
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    // 添加场地管理数据
+    addSitelist(data) {
+      Site.addSiteLsit(data).then((res) => {
+        if (res.code === 200) {
+          Message.success("添加成功");
+          this.addVisible = false;
+          this.addFrom = {};
+          this.getSiteLsit();
         }
-      }).catch(err=>{console.log(err);})
-    }
+      });
+    },
+    // 查询字典表
+    siteCode() {
+      // CDDJ字典表
+      Promise.all(Allasig.siteCdCode(), Allasig.siteCdCode({ codeValue: "JFMS" })).then((res) => {
+        console.log(res);
+      }).catch(err=>{console.log(err);});
+    },
+    // 修改管理数据
+    updateSiteList(data) {
+      Site.updateByID(data).then((res) => {
+        if (res.code === 200) {
+          Message.success("修改成功");
+          this.getSiteLsit();
+        }
+      });
+    },
   },
-  created(){
-    this.getSiteLsit()
-  }
+  created() {
+    this.getSiteLsit();
+    this.siteCode();
+  },
 };
 </script>
 

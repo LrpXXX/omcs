@@ -1,6 +1,6 @@
 <template>
   <div class="from">
-    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="150px" class="demo-ruleForm">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="150px" class="demo-ruleForm" enctype="multipart/form-data">
       <el-form-item label="还样人员" prop="receivePerson">
         <el-input v-model="ruleForm.receivePerson" placeholder="填写还样人员"></el-input>
       </el-form-item>
@@ -17,12 +17,17 @@
         <el-input v-model="ruleForm.receiveTrailer"></el-input>
       </el-form-item>
       <el-form-item label="还样照片" prop="fzr">
-        <el-upload action="/api/editEviCard.jhtml" accept="image/*" multiple :auto-upload="false" style="display: inline-block">
-          <el-button type="primary" plain>
-            <i class="el-icon-upload el-icon--right"></i>
-            点击选择还样照片（最多8张，多选）
-          </el-button>
-          <div slot="tip">只能上传图片格式文件</div>
+        <el-upload
+          ref="fileUpload"
+          :action="fileUploadUrl"
+          :auto-upload="false"
+          :on-change="fileChange"
+          :on-remove="fileRemove"
+          :file-list="fileList"
+          :limit="1"
+          accept=".doc,.docx,.xls,.xlsx,.ppt,.pptx,.pdf"
+        >
+          <span slot="tip" style="margin-left: 20px">只能上传doc/docx/xls/xlsx/ppt/pptx/pdf文件</span>
         </el-upload>
       </el-form-item>
 
@@ -66,22 +71,39 @@ export default {
           },
         ],
       },
+      fileList: [
+        {
+          name: "food.jpeg",
+          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
+        },
+        {
+          name: "food2.jpeg",
+          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
+        },
+      ], //上传图片数据
     };
   },
   methods: {
     submitForm(formName) {
       console.log(this.ruleForm);
       this.$refs[formName].validate((valid) => {
-        console.log(valid);
         if (valid) {
-          const data = {
-            businessType: 2,
-            destination: this.ruleForm.destination,
-            receivePerson: this.ruleForm.receivePerson,
+          const smSample = {
+            smdestination: this.ruleForm.destination,
+            receivePerson: this.ruleFormreceivePerson,
             receiveTrailer: this.ruleForm.receiveTrailer,
             receiveContactNumber: this.ruleForm.receiveContactNumber,
             receiveIdentityNum: this.ruleForm.receiveIdentityNum,
           };
+
+          const data = {
+            files: this.fileList,
+            smSampleDTO: {
+              businessType: 2,
+              smSample,
+            },
+          };
+
           this.retrunReacod(data);
         }
       });
@@ -99,6 +121,18 @@ export default {
           console.log(err);
         });
     },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+    },
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
   },
 };
 </script>
@@ -111,6 +145,18 @@ export default {
   align-content: center;
   .demo-ruleForm {
     width: 50vw;
+  }
+  .deleteImg {
+    font-size: 30px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 999;
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
   }
 }
 </style>

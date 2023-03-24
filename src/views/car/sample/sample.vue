@@ -103,7 +103,7 @@ export default {
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
                   // return row.sampleState==='待送样';
-                  return true
+                  return true;
                 },
               },
               {
@@ -114,7 +114,7 @@ export default {
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
                   // return row.sampleState==='试验中';
-                  return true
+                  return true;
                 },
               },
               {
@@ -163,29 +163,36 @@ export default {
     // 搜索数据
     onSerch() {
       console.log(this.formInline);
-      let sampleStates=[]
-      if(this.formInline.type===undefined){
-        sampleStates=this.selecTion.map(item=>item.id)
-      }else{
-        sampleStates=this.selecTion.filter(item=>item.codeValue===this.formInline.type).map(item=>item.id)
+      let sampleStates = [];
+      if (this.formInline.type === undefined) {
+        sampleStates = this.selecTion.map((item) => item.id);
+      } else {
+        sampleStates = this.selecTion.filter((item) => item.codeValue === this.formInline.type).map((item) => item.id);
       }
       console.log(sampleStates);
-      const data={bookingNumber:this.formInline.bookingNumber,pageNum:1,pageSize:10,vinOrClassicNumber:this.formInline.vinOrClassicNumber,sampleStates}
-      this.getSampleList(data)
+      const data = {
+        bookingNumber: this.formInline.bookingNumber,
+        pageNum: 1,
+        pageSize: 10,
+        vinOrClassicNumber: this.formInline.vinOrClassicNumber,
+        sampleStates,
+      };
+      this.getSampleList(data);
     },
     onSuReg() {
-      this.formInline={}
+      this.formInline = {};
     },
     onAdd() {},
     rowOperation(row, $index, now) {
-      switch(now){
-        case 'seeSy':
-          this.$router.push('/car/recpectRecod')
+      switch (now) {
+        case "seeSy":
+          this.$router.push("/car/recpectRecod");
           break;
-          case 'seeHy':
-          this.$router.push('/car/returnRecod')
-            break;
-            default: break
+        case "seeHy":
+          this.$router.push("/car/returnRecod");
+          break;
+        default:
+          break;
       }
     },
     // 查询样车状态
@@ -207,7 +214,7 @@ export default {
           }
           return item;
         });
-       this.tableDate=arr
+        this.tableDate = arr;
       }
     },
   },

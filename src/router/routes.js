@@ -5,7 +5,7 @@
 const Layout = () => import("@/views/layout/index.vue"),
   Login = () => import("@/views/login/login.vue"),
   NotFound = () => import("@/views/error/404.vue"),
-  Forget=()=>import("@/views/login/forget.vue")
+  Forget = () => import("@/views/login/forget.vue");
 // 任何角色都能访问的静态路由
 export const staticRoutes = [
   // {
@@ -232,26 +232,140 @@ export const staticRoutes = [
       },
     ],
   },
+  // 消息管理
+  {
+    path: "/message",
+    component: Layout,
+    meta: {
+      title: "消息管理",
+    },
+    children: [
+      {
+        path: "/message/notifiction",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/notifiction.vue"),
+        meta: {
+          title: "通知公告",
+          roles: [],
+        },
+      },
+      {
+        path: "/message/messageAdd",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/components/editMessage.vue"),
+        meta: {
+          title: "新增/编辑公告",
+          roles: [],
+        },
+      },
+      {
+        path: "/message/notifiction1",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/notifiction.vue"),
+        meta: {
+          title: "通知消息",
+          roles: [],
+        },
+      },
+      {
+        path: "/message/notifiction2",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/notifiction.vue"),
+        meta: {
+          title: "帮助管理",
+          roles: [],
+        },
+      },
+      {
+        path: "/message/notifiction3",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/notifiction.vue"),
+        meta: {
+          title: "协议管理",
+          roles: [],
+        },
+      },
+    ],
+  },
+  // 权限角色
+  {
+    path: "/auth",
+    component: Layout,
+    meta: {
+      title: "权限角色",
+      roles: [],
+    },
+    children: [
+      {
+        path: "/auth/tissue",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/auth/tissue"),
+        meta: {
+          title: "组织管理",
+          roles: [],
+        },
+      },
+      {
+        path: "/auth/tissuesave",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/auth/tissue/editFrom.vue"),
+        meta: {
+          title: "组织管理新增",
+          roles: [],
+          hidden:false
+        },
+      },
+      {
+        path: "/auth/role",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/auth/role"),
+        meta: {
+          title: "角色管理",
+          roles: [],
+        },
+      },
+      {
+        path: "/auth/system",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/auth/system"),
+        meta: {
+          title: "系统配置",
+          roles: [],
+        },
+      },
+    ],
+  },
+    // 系统配置
+    {
+      path: "/config",
+      component: Layout,
+      meta: {
+        title: "系统配置",
+        roles: [],
+      },
+      children: [
+        {
+          path: "/config/personnel",
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/auth/tissue"),
+          meta: {
+            title: "人员配置",
+            roles: [],
+          },
+        },
+        {
+          path: "/config/car",
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/auth/role"),
+          meta: {
+            title: "车辆配置",
+            roles: [],
+          },
+        },
+        {
+          path: "/config/fixed",
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/auth/system"),
+          meta: {
+            title: "固设配置",
+            roles: [],
+          },
+        },
+      ],
+    },
   {
     path: "/login",
     component: Login,
     meta: {
       title: "登录",
-      hidden: true,
-    },
-  },
-  {
-    path: "/forget",
-    component: Forget,
-    meta: {
-      title: "忘记密码",
-      hidden: true,
-    },
-  },{
-    path: "/editPassword",
-    component: Forget,
-    meta: {
-      title: "修改密码",
       hidden: true,
     },
   },

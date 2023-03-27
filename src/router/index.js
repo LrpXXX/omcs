@@ -94,7 +94,6 @@ export function resetRouter() {
 // 路由守卫
 router.beforeEach((to, from, next) => {
   nprogress.start();
-  console.log(to.matched);
   // 路由守卫判断
   if (!to.matched.length) {
     next("/404");

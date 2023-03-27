@@ -11,10 +11,10 @@ export const Sample={
     },
     // 送还样添加信息
     recodsAdd(data){
-            return  http.postFrom('/system/sm-sample/add',qs.parse(qs.stringify(data))).then(res=>res).catch(err=>err)
+            return  http.upload('/system/sm-sample/add',data).then(res=>res).catch(err=>err)
     },
     // 还样图片数据
     recodeUplod(file){
-        return  http.upload('/system/sm-sample/add',file,).then(res=>res).catch(err=>err)
+        return  http.upload('/system/sm-sample/add',file).then(res=>res).catch(err=>err)
     }
 }

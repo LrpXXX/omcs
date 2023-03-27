@@ -13,7 +13,7 @@ module.exports = defineConfig({
   productionSourceMap: false,
   //对内部的 webpack 配置进行更细粒度的修改
   chainWebpack: (config) => {
-    config.resolve.alias.set("@", resolve("./src"));
+    config.resolve.alias.set("@", resolve("./src"),resolve('node_modlues/@wangeditor'));
     /**
      * 删除懒加载模块的prefetch，降低带宽压力
      * https://cli.vuejs.org/zh/guide/html-and-static-assets.html#prefetch

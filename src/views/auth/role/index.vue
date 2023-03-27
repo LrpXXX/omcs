@@ -183,7 +183,7 @@ export default {
     rowOperation(row, $index, now) {
       switch (now) {
         case "editClose":
-          this.openTree = tree;
+          this.openTree = true;
           break;
         case 'editOpen':
           this.saveVisble=true

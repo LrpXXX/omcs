@@ -69,7 +69,7 @@
     </el-table>
 
     <!-- 分页 -->
-    <div class="page-wrap" :style="{ textAlign: pageObj.position || 'center' }">
+    <div class="page-wrap" :style="{ textAlign: pageObj.position || 'right' }">
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"

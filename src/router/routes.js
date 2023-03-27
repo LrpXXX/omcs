@@ -337,7 +337,7 @@ export const staticRoutes = [
       children: [
         {
           path: "/config/personnel",
-          component: () => import(/* webpackChunck 'userInfo' */ "@/views/auth/tissue"),
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/personnel"),
           meta: {
             title: "人员配置",
             roles: [],
@@ -345,7 +345,7 @@ export const staticRoutes = [
         },
         {
           path: "/config/car",
-          component: () => import(/* webpackChunck 'userInfo' */ "@/views/auth/role"),
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/car"),
           meta: {
             title: "车辆配置",
             roles: [],
@@ -353,7 +353,7 @@ export const staticRoutes = [
         },
         {
           path: "/config/fixed",
-          component: () => import(/* webpackChunck 'userInfo' */ "@/views/auth/system"),
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/fixed"),
           meta: {
             title: "固设配置",
             roles: [],

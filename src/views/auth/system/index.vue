@@ -206,6 +206,7 @@ export default {
       ruleForm: {},
       rules: {},
       pageObj: {
+        position:'right',
         total: 20,
       },
     };

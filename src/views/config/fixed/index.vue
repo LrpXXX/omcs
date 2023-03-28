@@ -23,7 +23,7 @@
       </el-form-item>
     </el-form>
     <!-- 表单列表 -->
-    <commonTable :table-data="tableData" :colum-obj="columObj" :page-obj="pageObj" ></commonTable>
+    <commonTable :table-data="tableData" :colum-obj="columObj" :page-obj="pageObj" @rowOperation="rowOperation" ></commonTable>
     <!-- 新增/编辑页面 -->
     <el-dialog title="新增/编辑固设" :visible.sync="openVisle">
       <el-form :model="rulFrom" :rules="rules" ref="rulFrom" label-width="100px">
@@ -113,7 +113,7 @@ export default {
                 },
               },
               {
-                operation: "delet",
+                operation: "delete",
                 type: "text",
                 label: "禁用",
                 icon: "",
@@ -124,7 +124,7 @@ export default {
                 },
               },
               {
-                operation: "see",
+                operation: "delete",
                 type: "text",
                 label: "启用",
                 icon: "",
@@ -150,11 +150,37 @@ export default {
       this.openVisle=true
     },
     submitForm(formName){
-
+      console.log(this.rulFrom);
+      this.$refs[formName].validate().then(res=>{
+        if(res){
+          if(this.rulFrom.id===undefined){
+            console.log('新增呀');
+            this.rulFrom={}
+          }else{
+            console.log('没东西');
+            this.rulFrom={}
+          }
+          
+          this.openVisle=false
+        }
+      })
     },
     resetForm(fromName){
       this.$refs[fromName].resetFields()
       this.openVisle=false
+    },
+    rowOperation(row,$index,now){
+      switch (now) {
+        case 'editOpen':
+          this.openVisle=true;
+          this.rulFrom=JSON.parse(JSON.stringify(row))
+          break;
+        case 'delete':
+          console.log(`这是${row.type}`);
+          break;
+        default:
+          break;
+      }
     }
   },
 };

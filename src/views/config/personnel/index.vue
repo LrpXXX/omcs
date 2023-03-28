@@ -1,7 +1,8 @@
 <template>
-  <div>
+  <div class="personnel">
     <el-card class="card-demo">
       驾驶人员配置
+      <div class="stu"></div>
       <el-form :model="timeFrom" :rules="timeFromRul" :inline="true">
         <el-form-item label="培训有效时间" prop="time">
           <el-input v-model="timeFrom.time" placeholder="请填入驾驶有效时间，单位为年"></el-input>
@@ -38,14 +39,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.personnel{
+  width: 1200px;
+  margin: auto;
+}
 .card-demo {
-  width: 95vw;
   background-color: #ccc;
   margin: 0 auto;
   margin-bottom: 20px;
-  padding: 10px;
+  height: 20vh;
   .buttom{
     border-bottom: 2px solid #494747;
+    margin: 20px -30px;
+  }
+  .stu{
+    margin: 20px;
   }
 }
 </style>

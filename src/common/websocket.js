@@ -85,7 +85,7 @@ class ClxWebsocket {
                 if(self.$store) return;
                 // 获取store
                 self.$store = this.$store;
-                console.log(this.$store)
+               
             }
         })
     }

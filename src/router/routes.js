@@ -250,23 +250,23 @@ export const staticRoutes = [
       },
       {
         path: "/message/messageAdd",
-        component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/components/editMessage.vue"),
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/editNotific.vue"),
         meta: {
           title: "新增/编辑公告",
           roles: [],
         },
       },
       {
-        path: "/message/notifiction1",
-        component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/notifiction.vue"),
+        path: "/message/notiMessage",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/notiMessage.vue"),
         meta: {
           title: "通知消息",
           roles: [],
         },
       },
       {
-        path: "/message/notifiction2",
-        component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/notifiction.vue"),
+        path: "/message/helpMessage",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/helpMessage.vue"),
         meta: {
           title: "帮助管理",
           roles: [],
@@ -356,6 +356,14 @@ export const staticRoutes = [
           component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/fixed"),
           meta: {
             title: "固设配置",
+            roles: [],
+          },
+        },
+        {
+          path: "/config/loginBg",
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/loginBg"),
+          meta: {
+            title: "登录地图配置",
             roles: [],
           },
         },

@@ -25,7 +25,12 @@
         <el-button type="primary" @click="onAdd">新增</el-button>
       </el-form-item>
     </el-form>
-    <commonTale :tableData="tableData" :columObj="columObj" :pageObj="pageObj"></commonTale>
+    <commonTale :tableData="tableData" :columObj="columObj" :pageObj="pageObj" @rowOperation="rowOperation"></commonTale>
+    <!-- 查看通知公告模态框 -->
+    <el-dialog title="查看详情" :visible.sync="openSee">
+      <h1 style="text-align: center;">{{ seeData.title }}</h1>
+      <p style="text-indent: 2em;margin-top:10px ;">{{ seeData.main }}</p>
+    </el-dialog>
   </div>
 </template>
 
@@ -35,7 +40,9 @@ export default {
   components: { commonTale },
   data() {
     return {
+      openSee:false,
       formInline: {},
+      seeData:{},
       tableData: [
         {
           id: 1,
@@ -120,7 +127,7 @@ export default {
                 },
               },
               {
-                operation: "delet",
+                operation: "delete",
                 type: "text",
                 label: "删除",
                 icon: "",
@@ -131,14 +138,14 @@ export default {
                 },
               },
               {
-                operation: "see",
+                operation: "calback",
                 type: "text",
                 label: "撤回",
                 icon: "",
                 // color: "blue",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
-                  return true;
+                  return row.ffzt==='已发布';
                 },
               },
             ],
@@ -151,9 +158,42 @@ export default {
     };
   },
   methods: {
+    // 确认取消
+    calback(){
+      this.$confirm('是否确定撤回该通知公告?', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$message({
+            type: 'success',
+            message: '撤回成功!'
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消撤回'
+          });          
+        });
+    },
     onSerch() {},
     onSuReg() {},
-    onAdd() {},
+    onAdd() {
+      this.$router.push('/message/messageAdd')
+    },
+    rowOperation(row,$index,now){
+      switch (now) {
+        case 'see':
+          this.openSee=true;
+          this.seeData=row
+          break;
+        case 'calback':
+          this.calback()
+          break
+        default:
+          break;
+      }
+    }
   },
 };
 </script>

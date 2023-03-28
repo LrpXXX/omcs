@@ -79,7 +79,7 @@
         :page-size="pageObj.pageSize"
         background
         layout="total, sizes, prev, pager, next,jumper"
-        :total="pageObj.total"
+        :total="pageObj.total || 10"
       ></el-pagination>
     </div>
   </div>

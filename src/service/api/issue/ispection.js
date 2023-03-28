@@ -50,11 +50,4 @@ export const Ispection = {
       .then((res) => res)
       .catch((err) => err);
   },
-  // 通信权限得新增或修改
-  saveOrUpate(data) {
-    return http
-      .post("/system/sm-patrol-vehicle-right/saveOrUpdate",data)
-      .then((res) => res)
-      .catch((err) => err);
-  },
 };

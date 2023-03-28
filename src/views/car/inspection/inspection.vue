@@ -52,10 +52,10 @@
         </el-form-item>
       </el-form>
     </el-dialog>
-    <!-- 同行权限 -->
+    <!-- 通行权限 -->
     <el-dialog title="选择通行权限" :visible.sync="roluesVisible" class="auth">
       <el-checkbox-group v-model="checkedAuthe">
-        <el-checkbox v-for="item in authe" :label="item.siteName" :key="item.id" style="display: block">{{ item.siteName }}</el-checkbox>
+        <el-checkbox v-for="item in authe" :label="item.siteName" :key="item.value" style="display: block">{{ item.siteName }}</el-checkbox>
       </el-checkbox-group>
       <span>有效时间</span>
       <el-date-picker
@@ -201,6 +201,7 @@ export default {
           this.roluesVisible = true;
           // this.authList(row.id)
           this.vehicleId=row.id
+          console.log(row.id);
           this.authChecked(row.id)
           break;
         case "delete":
@@ -352,7 +353,7 @@ export default {
 
     // 修改查询权限
     saveOrUpate(date) {
-      Ispection.saveOrUpate(date).then(res=>{
+      Ispection.ispectionListUpdate(date).then(res=>{
         if(res.code===200){
           Message.success('修改成功')
           this.roluesVisible=false

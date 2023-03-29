@@ -6,7 +6,7 @@
         <el-input v-model.trim="formInline.name"></el-input>
       </el-form-item>
       <el-form-item label="车牌号" prop="carCode">
-        <el-input v-model.trim="formInline.carcode" placeholder="车牌号码"></el-input>
+        <el-input v-model.trim="formInline.carCode" placeholder="车牌号码"></el-input>
       </el-form-item>
       <el-form-item label="联系人" prop="lyname">
         <el-input v-model.trim="formInline.lyname" placeholder="联系人"></el-input>
@@ -39,8 +39,7 @@
         </el-form-item>
         <el-form-item label="车辆类型" prop="patrolType">
           <el-select v-model="openFrom.patrolType" placeholder="请选择车辆类型">
-            <el-option label="试验样车" value="试验样车"></el-option>
-            <el-option label="巡检车辆" value="巡检车辆"></el-option>
+            <el-option v-for="item in selectList" :key="item.id" :label="item.codeText" :value="item.codeValue"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
@@ -55,7 +54,7 @@
     <!-- 通行权限 -->
     <el-dialog title="选择通行权限" :visible.sync="roluesVisible" class="auth">
       <el-checkbox-group v-model="checkedAuthe">
-        <el-checkbox v-for="item in authe" :label="item.siteName" :key="item.value" style="display: block">{{ item.siteName }}</el-checkbox>
+        <el-checkbox v-for="item in authe" :label="item.siteName" :key="item.id" style="display: block">{{ item.siteName }}</el-checkbox>
       </el-checkbox-group>
       <span>有效时间</span>
       <el-date-picker
@@ -68,7 +67,7 @@
       ></el-date-picker>
       <div class="btn">
         <el-button @click="exit">取消</el-button>
-        <el-button type="primary" @click="authAdd">确认</el-button>
+        <el-button type="primary" @click="authAddorSave">确认</el-button>
       </div>
     </el-dialog>
   </div>
@@ -84,13 +83,13 @@ import { Ispection } from "@/service/api/issue/ispection";
 import { Message } from "element-ui";
 import { Site } from "@/service/api/site/site";
 import { formatDate } from "@/service/zdk/timeTime";
+import { Allasig } from "@/service/api/all";
 export default {
   components: { commonTale },
   data() {
     return {
       formInline: {},
-      tableData: [
-      ],
+      tableData: [],
       columObj: {
         columnData: [
           {
@@ -119,7 +118,7 @@ export default {
           },
           {
             text: true,
-            prop: "time",
+            prop: `createTime`,
             label: "有效时间",
             align: "center",
           },
@@ -178,7 +177,7 @@ export default {
       },
       pageObj: {
         position: "right", //分页组件位置
-        total: 20,
+        total: 10,
         pageIndex: 1,
         pageSize: 10,
       },
@@ -187,11 +186,14 @@ export default {
       openRul: {},
       roluesVisible: false,
       // authe: ["直线性能路", "制动评价路", "NVH评价路", "噪声路", "强化坏路", "坡道路", "动态圆广场A", "动态圆广场B"],
-      authe:[],
+      authe: [],
       value: "",
-      checkedAuthe: ["直线性能路线"],
-      vehicleId:'',
-      id:''
+      checkedAuthe: [],
+      // 巡检车辆ID
+      vehicleId: "",
+      // checkedAuthe是否拥有ID
+      id: "",
+      selectList: [],
     };
   },
   methods: {
@@ -200,9 +202,9 @@ export default {
         case "see":
           this.roluesVisible = true;
           // this.authList(row.id)
-          this.vehicleId=row.id
-          console.log(row.id);
-          this.authChecked(row.id)
+          // 获取到的巡检车辆ID
+          this.vehicleId = row.id;
+          this.authChecked(row.id);
           break;
         case "delete":
           this.$confirm("是否删除该巡检车辆？", {
@@ -228,8 +230,26 @@ export default {
           break;
       }
     },
-    onSerch() {},
-    onSuReg() {},
+    // 模糊匹配
+    onSerch() {
+      console.log(this.formInline);
+      const data = {
+        contactPerson: this.formInline.lyname,
+        vehicleNumber: this.formInline.carCode,
+        vehicleName: this.formInline.name,
+        pageSize: 1,
+        pageNumber: 10,
+      };
+      console.log(data);
+      this.sercheIspection(data);
+      this.formInline={}
+    },
+    // 重置表单查询
+    onSuReg() {
+      // 重置表单数据
+      this.sercheIspection();
+      this.formInline={}
+    },
     onAdd() {
       this.openVisible = true;
     },
@@ -291,10 +311,9 @@ export default {
     sercheIspection(data) {
       Ispection.ispectionList(data)
         .then((res) => {
+          console.log(res, "巡检车辆数据");
           if (res.code === 200) {
             this.tableData = res.data.records;
-            const time=`${res.data.records.timeStart}-${res.data.records.timeEnd}`
-            this.$set(this.tableData,'time',time)
           }
         })
         .catch((err) => {
@@ -315,83 +334,155 @@ export default {
         });
     },
     // 根据VehicleId查询权限列表进行判断回显
-    authChecked(id){
-      Ispection.getVehicleId(id).then(res=>{
-        console.log(res);
-        if(res.code===200){
-          // 判断id得值
-          this.id=res.data.id
-          // 对siteI的进行处理回显
-          // const auth=[...res.data.siteId]
-          const auth=(res.data.siteId).split(',')
-            // 选中得数组
-          this.checkedAuthe=  this.authe.map(item=>{
-              for(const i of auth){
-                if(item.id===i){
-                  return  item.siteName
+    async authChecked(id) {
+      console.log(id);
+      let res = await Ispection.getVehicleId(id);
+      // 回显选中auth
+      console.log(res.data);
+      if (res.code === 200) {
+        if (res.data.length > 0) {
+          this.id = 1;
+          // 选中得数组
+          this.checkedAuthe = this.authe
+            .map((item) => {
+              for (const i of res.data) {
+                if (item.id === i.siteId) {
+                  return item.siteName;
                 }
               }
-            }).filter(item=>item)
+            })
+            .filter((item) => item);
           console.log(this.checkedAuthe);
+        } else {
+          this.id = undefined;
+          this.checkedAuthe = [];
         }
-      }).catch(err=>{
-        console.log(err);
-      })
+      }
     },
     // 查询所有道路权限列表
-    authList() {
-      Site.getList()
-        .then((res) => {
-          if (res.code === 200) {
-            this.authe = res.data;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-
-    // 修改查询权限
-    saveOrUpate(date) {
-      Ispection.ispectionListUpdate(date).then(res=>{
-        if(res.code===200){
-          Message.success('修改成功')
-          this.roluesVisible=false
+    async authList() {
+      try {
+        let res = await Site.getList();
+        if (res.code === 200) {
+          this.authe = res.data;
         }
-      }).catch(err=>{
-        console.log(err);
-      });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    // 查询XJRYCLPZ数据
+    async getPZList() {
+      try {
+        let res = await Allasig.siteCdCode({ codeValue: "XJRYCLPZ" });
+        if (res.code === 200) {
+          this.selectList = res.data;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    // 修改或者道路权限
+    async saveOrUpate(data, saveData) {
+      console.log(saveData);
+      // 新增为undefind  否则为修改
+      if (this.id === undefined) {
+        // 先进行规则校验
+        const siteRule = await Allasig.siteRuleValidation(data);
+        console.log(siteRule.code);
+        if (siteRule.code == 200) {
+          console.log("新增十八", saveData);
+          this.addVehcl(saveData);
+        }
+      } else {
+        const siteRule = await Allasig.siteRuleValidation(data);
+        if (siteRule.code == 200) {
+          console.log("修改对吧", saveData);
+          this.updateVehclAdd(saveData);
+        }
+      }
+    },
+    // 新增权限管理
+    async addVehcl(data) {
+      try {
+        let res = await Ispection.vehicledAdd(data);
+        if (res.code === 200) {
+          Message.success("权限新增成功");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    // 修改权限管理
+    async updateVehclAdd(data) {
+      try {
+        let res = await Ispection.vehicledUpade(data);
+        if (res.code === 200) {
+          Message.success("权限修改成功");
+        }
+      } catch (error) {
+        console.log(error);
+      }
     },
     // 取消权限管理
     exit() {
       this.roluesVisible = false;
-      this.value=''
+      this.value = "";
     },
-    // 新增或修改权限管理处理数据
-    authAdd() {
-      const autheId = this.authe
+    // 新增或修改权限管理处理数据确认确认按钮
+    authAddorSave() {
+      const timeArr = [];
+      for (const item of this.value) {
+        timeArr.push(formatDate(item));
+      }
+      let smPatrolVehicleRightList = [];
+      smPatrolVehicleRightList = this.authe
         .map((item) => {
           for (const i of this.checkedAuthe) {
             if (i === item.siteName) {
-              return item.id;
+              return item;
             }
           }
         })
         .filter((item) => item);
-      const timeArr = [];
-      for (const item of this.value) {
-        timeArr.push(formatDate(item))
+      let data = [];
+      if (this.id === undefined) {
+        data = this.authe
+          .map((item) => {
+            for (const i of this.checkedAuthe) {
+              if (i === item.siteName) {
+                return { siteId: item.id, timeEnd: timeArr[1], timeStart: timeArr[0], vehicleId: this.vehicleId };
+              }
+            }
+          })
+          .filter((item) => item);
+        console.log(data);
+      } else {
+        let newData = this.authe
+          .map((item) => {
+            for (const i of this.checkedAuthe) {
+              if (i === item.siteName) {
+                return { siteId: item.id, timeEnd: timeArr[1], timeStart: timeArr[0], vehicleId: this.vehicleId };
+              }
+            }
+          })
+          .filter((item) => item);
+        data = {
+          smPatrolVehicleRightList: newData,
+          vehicleId: this.vehicleId,
+        };
       }
-      console.log(timeArr);
-      const data={id:this.id,vehicleId:this.vehicleId,siteId:autheId.join(),timeStart:timeArr[0],timeEnd:timeArr[1]}
-      this.saveOrUpate(data)
+      this.saveOrUpate(smPatrolVehicleRightList, data);
+      this.roluesVisible = false;
     },
   },
+  // 生命周期开发
   created() {
     // 获取表单数据
     this.sercheIspection();
     // 获取道路权限列表数据
-    this.authList()
+    this.authList();
+    // 获取车辆类型数据
+    this.getPZList();
   },
 };
 </script>

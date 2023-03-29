@@ -41,17 +41,12 @@
         </el-form-item>
         <el-form-item label="场地等级" prop="siteLevel">
           <el-radio-group v-model="addFrom.siteLevel">
-            <el-radio label="一级"></el-radio>
-            <el-radio label="二级"></el-radio>
-            <el-radio label="三级"></el-radio>
+            <el-radio v-for="item in  CDDJList" :key="item.id" :label="item.codeValue" >{{ item.codeText }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="计费模式" prop="billingMode">
           <el-radio-group v-model="addFrom.billingMode">
-            <el-radio label="按时长 "></el-radio>
-            <el-radio label="按里程"></el-radio>
-            <el-radio label="按次数"></el-radio>
-            <el-radio label="按天数"></el-radio>
+            <el-radio v-for="item in  JFMSList" :key="item.id" :label="item.codeValue" >{{ item.codeText }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="是否包场" prop="blockBooking">
@@ -80,17 +75,12 @@
         </el-form-item>
         <el-form-item label="场地等级" prop="siteLevel">
           <el-radio-group v-model="eidtFrom.siteLevel">
-            <el-radio label="一级"></el-radio>
-            <el-radio label="二级"></el-radio>
-            <el-radio label="三级"></el-radio>
+            <el-radio v-for="item in  CDDJList" :key="item.id" :label="item.codeValue" >{{ item.codeText }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="计费模式" prop="billingMode">
           <el-radio-group v-model="eidtFrom.billingMode" disabled>
-            <el-radio label="按时长 "></el-radio>
-            <el-radio label="按里程"></el-radio>
-            <el-radio label="按次数"></el-radio>
-            <el-radio label="按天数"></el-radio>
+            <el-radio v-for="item in  JFMSList" :key="item.id" :label="item.codeValue" >{{ item.codeText }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="是否包场" prop="blockBooking">
@@ -149,6 +139,7 @@ export default {
         billingMode: [{ required: true, message: "请选择计费模式", trigger: "change" }],
         blockBooking: [{ required: true, message: "是否包场", trigger: "change" }],
       },
+      // 编辑弹窗
       dialogFormVisible: false,
       dialogRlVisible: false,
       addVisible: false,
@@ -327,6 +318,10 @@ export default {
         pageIndex: 1,
         pageSize: 10,
       },
+      // 计费模式数据
+      JFMSList:[],
+      // 场地等级数据
+      CDDJList:[]
     };
   },
   methods: {
@@ -387,18 +382,45 @@ export default {
         if (res) {
           if (fromName === "addFrom") {
             console.log("新增呀");
+            const siteLevel=this.CDDJList.map(item=>{
+              if(item.codeValue===this.addFrom.siteLevel){
+                return  item.codeValue
+              }
+            }).filter(item=>item).toString()
+            const billingMode=this.JFMSList.map(item=>{
+              if(item.codeValue===this.addFrom.siteLevel){
+                return  item.codeValue
+              }
+            }).filter(item=>item).toString()
             const data = {
               siteName: this.addFrom.siteName,
               siteCapacity: this.addFrom.siteCapacity,
-              siteLevel: this.addFrom.siteLevel,
-              billingMode: this.addFrom.billingMode,
+              siteLevel,
+              billingMode,
               blockBooking: this.addFrom.blockBooking === "是" ? 0 : 1,
               remark: this.addFrom.remark,
             };
+            console.log(data);
             this.addSitelist(data);
+            this.addVisible=false
             console.log(data);
           } else if (fromName === "eidtFrom") {
-            console.log("修改呀");
+            const siteLevel=this.CDDJList.map(item=>{
+              if(item.codeValue===this.eidtFrom.siteLevel){
+                return  item.codeValue
+              }
+            }).filter(item=>item).toString()
+            const data={
+              siteName:this.eidtFrom.siteName,
+              siteCapacity:this.eidtFrom.siteCapacity,
+              siteLevel,
+              billingMode:this.eidtFrom.billingMode,
+              blockBooking:this.eidtFrom.blockBooking ==='是'?0:1,
+              remark:this.eidtFrom.remark
+            }
+            console.log("修改呀",data);
+            this.updateSiteList(data)
+            this.dialogFormVisible=false
           }
         }
       });
@@ -413,16 +435,34 @@ export default {
     },
     // 查询场地数据
     getSiteLsit() {
-      Site.getList()
+      Site.getPageList()
         .then((res) => {
           if (res.code === 200) {
-            this.tableData = res.data.map((item) => {
+            let newData = res.data.records.map((item) => {
               item.blockBooking === 1 ? (item.blockBooking = "是") : (item.blockBooking = "否");
               item.blockState === 0 ? (item.blockState = "未包场") : (item.blockState = "已包场");
               item.closeState === 0 ? (item.closeState = "未封场") : (item.closeState = "已封场");
               item.flag === 0 ? (item.flag = "启用") : (item.flag = "禁用");
               return item;
             });
+            console.log(this.tableData);
+            // this.tableData=newData.map(item=>{})
+            // 处理CDDJ
+           this.tableData= newData.map(items=>{
+              for (const item of this.CDDJList) {
+                  if(item.codeValue===items.siteLevel){
+                    return  item.codeText
+                  }
+            }
+            }).map(items=>{
+              for (const item of this.JFMSList) {
+                  if(item.codeValue===items.siteLevel){
+                    return  item.codeText
+                  }
+            }
+            })
+            // 处理计费模式
+
           }
         })
         .catch((err) => {
@@ -443,9 +483,17 @@ export default {
     // 查询字典表
     siteCode() {
       // CDDJ字典表
-      Promise.all(Allasig.siteCdCode(), Allasig.siteCdCode({ codeValue: "JFMS" })).then((res) => {
-        console.log(res);
-      }).catch(err=>{console.log(err);});
+      Allasig.siteCdCode().then(res=>{
+        if(res.code===200){
+          this.CDDJList=res.data
+        }
+      })
+      // 计费模式字典表
+      Allasig.siteCdCode({ codeValue: "JFMS" }).then(res=>{
+        if(res.code===200){
+          this.JFMSList=res.data
+        }
+      })
     },
     // 修改管理数据
     updateSiteList(data) {
@@ -459,6 +507,7 @@ export default {
   },
   created() {
     this.getSiteLsit();
+    // 获取场地和计费模式的字典表数据
     this.siteCode();
   },
 };

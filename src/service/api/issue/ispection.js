@@ -3,9 +3,10 @@ import http from "@/service/http";
 export const Ispection = {
   /**
    * @param  data {pageNum,pageSize,...args}
+   *          
    *  @author  模糊查询和分页查询
    */
-  ispectionList(data = { pageNum: 1, pageSize: 10 }) {
+  ispectionList(data = { pageNum: 1, pageSize: 10,contactPerson:'',vehicleName:'',vehicleNumber:'' }) {
     return http
       .post("/system/sm-patrol-vehicle/getPatrolVehiclePage", data)
       .then((res) => res)
@@ -47,6 +48,20 @@ export const Ispection = {
   getVehicleId(id) {
     return http
       .get("/system/sm-patrol-vehicle-right/getVehicleId", { id })
+      .then((res) => res)
+      .catch((err) => err);
+  },
+  // 巡检车辆权限管理新增
+  vehicledAdd(data) {
+    return http
+      .post("/system/sm-patrol-vehicle-right/add", data)
+      .then((res) => res)
+      .catch((err) => err);
+  },
+  // 巡检车辆管理权限修改
+  vehicledUpade(data) {
+    return http
+      .post("/system/sm-patrol-vehicle-right/updateById", data)
       .then((res) => res)
       .catch((err) => err);
   },

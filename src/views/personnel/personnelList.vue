@@ -2,84 +2,83 @@
   <!-- Table -->
   <div>
     <!-- 驾驶人员书 -->
-    <el-form v-model="formInline"  :inline="true">
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model.trim="formInline.name"></el-input>
-        </el-form-item>
-        <el-form-item label="人员状态" prop="region">
-          <el-select v-model.trim="formInline.region" placeholder="人员类别">
-            <el-option label="保洁" value="保洁"></el-option>
-            <el-option label="维修" value="维修"></el-option>
-            <el-option label="管理" value="管理"></el-option>
-            <el-option label="服务保障" value="服务保障"></el-option>
-            <el-option label="场地维护" value="场地维护"></el-option>
-            <el-option label="其他" value="其他"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="培训状态" prop="region">
-          <el-select v-model.trim="formInline.region" placeholder="培训状态">
-            <el-option label="已通过" value="已通过"></el-option>
-            <el-option label="待培训" value="待培训"></el-option>
-            <el-option label="不通过" value="不通过"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="驾驶状态" prop="region">
-          <el-select v-model.trim="formInline.region" placeholder="驾驶状态">
-            <el-option label="全部" value="全部"></el-option>
-            <el-option label="可驾驶" value="可驾驶"></el-option>
-            <el-option label="不可驾驶" value="不可驾驶"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="准驾车型" prop="region">
-          <el-select v-model.trim="formInline.region" placeholder="人员类别">
-            <el-option label="全部" value="全部"></el-option>
-            <el-option label="A1" value="A1"></el-option>
-            <el-option label="A2" value="A2"></el-option>
-            <el-option label="A3" value="A3"></el-option>
-            <el-option label="B1" value="B1"></el-option>
-            <el-option label="B2" value="B2"></el-option>
-            <el-option label="C1" value="C1"></el-option>
-            <el-option label="C2" value="C2"></el-option>
-            <el-option label="C3" value="C  3"></el-option>
-            <el-option label="C4" value="C4"></el-option>
-            <el-option label="C5" value="C5"></el-option>
-            <el-option label="D" value="D"></el-option>
-            <el-option label="E" value="E"></el-option>
-            <el-option label="F" value="F"></el-option>
-            <el-option label="M" value="M"></el-option>
-            <el-option label="N" value="N"></el-option>
-            <el-option label="P" value="P"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="onSerch">查询</el-button>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="onSuReg">重置</el-button>
-        </el-form-item>
-        <el-form-item style="float: right;">
-          <el-button type="primary" @click="onSubAdd">新增</el-button>
-        </el-form-item>
-      </el-form>
+    <el-form v-model="formInline" class="serch" :inline="true">
+      <el-form-item label="姓名" prop="name">
+        <el-input v-model.trim="formInline.name"></el-input>
+      </el-form-item>
+      <el-form-item label="人员状态" prop="region">
+        <el-select v-model.trim="formInline.region" placeholder="人员类别">
+          <el-option label="保洁" value="保洁"></el-option>
+          <el-option label="维修" value="维修"></el-option>
+          <el-option label="管理" value="管理"></el-option>
+          <el-option label="服务保障" value="服务保障"></el-option>
+          <el-option label="场地维护" value="场地维护"></el-option>
+          <el-option label="其他" value="其他"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="培训状态" prop="region">
+        <el-select v-model.trim="formInline.region" placeholder="培训状态">
+          <el-option label="已通过" value="已通过"></el-option>
+          <el-option label="待培训" value="待培训"></el-option>
+          <el-option label="不通过" value="不通过"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="驾驶状态" prop="region">
+        <el-select v-model.trim="formInline.region" placeholder="驾驶状态">
+          <el-option label="全部" value="全部"></el-option>
+          <el-option label="可驾驶" value="可驾驶"></el-option>
+          <el-option label="不可驾驶" value="不可驾驶"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="准驾车型" prop="region">
+        <el-select v-model.trim="formInline.region" placeholder="人员类别">
+          <el-option label="全部" value="全部"></el-option>
+          <el-option label="A1" value="A1"></el-option>
+          <el-option label="A2" value="A2"></el-option>
+          <el-option label="A3" value="A3"></el-option>
+          <el-option label="B1" value="B1"></el-option>
+          <el-option label="B2" value="B2"></el-option>
+          <el-option label="C1" value="C1"></el-option>
+          <el-option label="C2" value="C2"></el-option>
+          <el-option label="C3" value="C  3"></el-option>
+          <el-option label="C4" value="C4"></el-option>
+          <el-option label="C5" value="C5"></el-option>
+          <el-option label="D" value="D"></el-option>
+          <el-option label="E" value="E"></el-option>
+          <el-option label="F" value="F"></el-option>
+          <el-option label="M" value="M"></el-option>
+          <el-option label="N" value="N"></el-option>
+          <el-option label="P" value="P"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onSerch">查询</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onSuReg">重置</el-button>
+      </el-form-item>
+      <el-form-item >
+        <el-button type="primary">导入</el-button>
+        <el-button type="primary" @click="onSubAdd">新增</el-button>
+      </el-form-item>
+    </el-form>
     <!-- 表单数据 -->
     <commonTable :table-data="tableData" :page-obj="pageObj" :colum-obj="columObj" @rowOperation="rowOperation"></commonTable>
     <!-- Form -->
     <el-button type="button" @click="dialogFormVisible = true">打开嵌套表单的 Dialog</el-button>
-    <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
-
-    </el-dialog>
+    <el-dialog title="收货地址" :visible.sync="dialogFormVisible"></el-dialog>
   </div>
 </template>
 
 <script>
-import { Message } from 'element-ui';
-import commonTable from '@/components/common-table/index.vue'
+import { Message } from "element-ui";
+import commonTable from "@/components/common-table/index.vue";
 export default {
-  components:{commonTable},
+  components: { commonTable },
   data() {
     return {
       dialogFormVisible: false,
-      formInline:{},
+      formInline: {},
       ruleForm: {
         name: "",
         tel: undefined,
@@ -341,29 +340,34 @@ export default {
           },
         ],
       },
-      pageObj:{
-        total:10
-      }
+      pageObj: {
+        total: 10,
+      },
     };
   },
-  methods:{
-    submitForm(fromName){
+  methods: {
+    submitForm(fromName) {
       console.log(fromName);
-      this.$refs[fromName].validate().then(res=>{
-        if(res){
+      this.$refs[fromName].validate().then((res) => {
+        if (res) {
           console.log(this.ruleForm);
-          Message.success('添加成功')
-          this.dialogFormVisible=false
+          Message.success("添加成功");
+          this.dialogFormVisible = false;
         }
-      })
+      });
     },
-    resetForm(fromName){
-      this.$refs[fromName].resetFields()
-      this.dialogFormVisible=false
+    resetForm(fromName) {
+      this.$refs[fromName].resetFields();
+      this.dialogFormVisible = false;
     },
-    onSuReg(){},
-    onSerch(){},
-    onSubAdd(){}
-  }
+    onSuReg() {},
+    onSerch() {},
+    onSubAdd() {},
+  },
 };
 </script>
+<style lang="scss" scoped>
+.serch{
+  white-space: nowrap;
+}
+</style>

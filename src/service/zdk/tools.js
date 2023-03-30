@@ -184,7 +184,7 @@ export default {
    * @param fileName 附件名称
    */
   downFileById (fileId, fileName) {
-    http.uploadFile('storage/download/' + fileId, {}, res => {
+    http.upload('storage/download/' + fileId, {}, res => {
       this.downFile(res, fileName)
     }, {
       responseType: 'blob'

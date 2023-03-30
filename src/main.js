@@ -21,13 +21,15 @@ import "@/common/element-ui";
 import "@/styles/element-variables.scss";
 // 自定义元素样式
 import "@/styles/global.scss";
-
+// 导入lodsh组件库
+import _ from 'lodash'
 Vue.prototype.$http = http;
 
 Vue.config.productionTip = false;
 
 Vue.use(directive);
 Vue.prototype.$t = tools
+Vue.prototype._ = _ // lodash JS工具库
 Vue.use(ws);
 
 console.log(window.WebVideoCtrl);

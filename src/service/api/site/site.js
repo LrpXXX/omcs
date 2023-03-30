@@ -7,8 +7,15 @@ export const Site = {
       .then((res) => res)
       .catch((err) => err);
   },
+  // 根据ID查询数据
+  getOneList(id) {
+    return http
+      .get("/system/sm-site/getById", { id })
+      .then((res) => res)
+      .catch((err) => err);
+  },
   // 分页查询数据
-  getPageList(parmay={pageNum:1,pageSize:10,continue:{}}) {
+  getPageList(parmay = { pageNum: 1, pageSize: 10 }) {
     return http
       .get("/system/sm-site/listPage", parmay)
       .then((res) => res)
@@ -17,9 +24,9 @@ export const Site = {
   /**
      * 封场、禁用清除容量
      * @parms  {
-            "field": "string",
-            "primaryKey": "string",
-            "value": {}
+            "field": "string", 对应字段
+            "primaryKey": "string",  id
+            "value": {}  需要改变得值
         }
         @return   Promise
      */

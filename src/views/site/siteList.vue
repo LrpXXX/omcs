@@ -41,12 +41,12 @@
         </el-form-item>
         <el-form-item label="场地等级" prop="siteLevel">
           <el-radio-group v-model="addFrom.siteLevel">
-            <el-radio v-for="item in  CDDJList" :key="item.id" :label="item.codeValue" >{{ item.codeText }}</el-radio>
+            <el-radio v-for="item in CDDJList" :key="item.id" :label="item.codeText">{{ item.codeText }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="计费模式" prop="billingMode">
           <el-radio-group v-model="addFrom.billingMode">
-            <el-radio v-for="item in  JFMSList" :key="item.id" :label="item.codeValue" >{{ item.codeText }}</el-radio>
+            <el-radio v-for="item in JFMSList" :key="item.id" :label="item.codeText">{{ item.codeText }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="是否包场" prop="blockBooking">
@@ -57,6 +57,12 @@
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input type="textarea" v-model="addFrom.remark"></el-input>
+        </el-form-item>
+        <el-form-item label="是否启用" prop="siteState">
+          <el-radio-group v-model="addFrom.siteState">
+            <el-radio label="是"></el-radio>
+            <el-radio label="否"></el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm('addFrom')">确定</el-button>
@@ -75,22 +81,29 @@
         </el-form-item>
         <el-form-item label="场地等级" prop="siteLevel">
           <el-radio-group v-model="eidtFrom.siteLevel">
-            <el-radio v-for="item in  CDDJList" :key="item.id" :label="item.codeValue" >{{ item.codeText }}</el-radio>
+            <el-radio v-for="item in CDDJList" :key="item.id" :label="item.codeText">{{ item.codeText }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="计费模式" prop="billingMode">
           <el-radio-group v-model="eidtFrom.billingMode" disabled>
-            <el-radio v-for="item in  JFMSList" :key="item.id" :label="item.codeValue" >{{ item.codeText }}</el-radio>
+            <el-radio v-for="item in JFMSList" :key="item.id" :label="item.codeText">{{ item.codeText }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="是否包场" prop="blockBooking">
           <el-radio-group v-model="eidtFrom.blockBooking">
-            <el-radio label="是" :value="eidtFrom.blockBooking"></el-radio>
-            <el-radio label="否" :value="eidtFrom.blockBooking"></el-radio>
+            <el-radio label="是"></el-radio>
+            <el-radio label="否"></el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input type="textarea" v-model="eidtFrom.remark"></el-input>
+        </el-form-item>
+        <el-form-item label="是否启用" prop="siteState">
+          <el-radio-group v-model="eidtFrom.siteState">
+            <el-radio v-for="item in isManyFileList" :label="item.value" :key="item.value">
+              {{ item.label }}
+            </el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm('eidtFrom')">确定</el-button>
@@ -101,11 +114,15 @@
     <!-- 修改容量 -->
     <el-dialog title="清除容量" :visible.sync="dialogRlVisible">
       <el-form :model="rlFrom" :rules="rlRules" ref="rlFrom" label-width="150px">
-        <el-form-item label="当前场地容量" prop="cdrl">
-          <el-input disabled v-model="rlFrom.cdrl"></el-input>
+        <el-form-item label="当前场地容量" prop="currentCapacity">
+          <el-input disabled v-model="rlFrom.currentCapacity"></el-input>
         </el-form-item>
-        <el-form-item label="容量修改为" prop="ncdrl">
-          <el-input text="number" v-model="rlFrom.ncdrl"></el-input>
+        <el-form-item label="容量修改为" prop="value">
+          <el-input text="number" v-model="rlFrom.value"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="dis('rlFrom')">确定</el-button>
+          <el-button @click="disEit('rlFrom')">取消</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -123,14 +140,18 @@ export default {
   },
   data() {
     return {
+      isManyFileList: [
+        { label: "是", value: 0 },
+        { label: "否", value: 1 },
+      ],
       // 搜索表单实例
       serchFrom: {},
       // 修改表单实例
       eidtFrom: {},
       rlFrom: {},
       rlRules: {
-        cdrl: [{ required: true, message: "请输入场地容量", trigger: "blur" }],
-        ncdrl: [{ required: true, message: "请输入场地容量", trigger: "blur" }],
+        currentCapacity: [{ required: true, message: "请输入场地容量", trigger: "blur" }],
+        value: [{ required: true, message: "请输入场地容量", trigger: "blur" }],
       },
       eidtRules: {
         siteName: [{ required: true, message: "请输入活动名称", trigger: "blur" }],
@@ -138,6 +159,7 @@ export default {
         siteLevel: [{ required: true, message: "请选择场地等级", trigger: "change" }],
         billingMode: [{ required: true, message: "请选择计费模式", trigger: "change" }],
         blockBooking: [{ required: true, message: "是否包场", trigger: "change" }],
+        siteState: [{ required: true, message: "是否包场", trigger: "change" }],
       },
       // 编辑弹窗
       dialogFormVisible: false,
@@ -213,7 +235,7 @@ export default {
           },
           {
             text: true,
-            prop: "flag",
+            prop: "siteState",
             label: "状态",
             width: "200",
             align: "center",
@@ -263,7 +285,7 @@ export default {
                 label: "解封",
                 icon: "",
                 isShow: (row, $index) => {
-                  return row.fctt !== "未封场";
+                  return row.closeState !== "未封场";
                 },
               },
               {
@@ -272,11 +294,11 @@ export default {
                 label: "封场",
                 icon: "",
                 isShow: (row, $index) => {
-                  return row.fctt === "未封场";
+                  return row.closeState === "未封场";
                 },
               },
               {
-                operation: "",
+                operation: "clearCu",
                 type: "text",
                 label: "清除容量",
                 icon: "",
@@ -287,25 +309,25 @@ export default {
                 },
               },
               {
-                operation: "delete",
+                operation: "open",
                 type: "text",
                 label: "启用",
                 icon: "",
                 // color: "blue",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
-                  return row.zt === "启用";
+                  return row.siteState !== "启用";
                 },
               },
               {
-                operation: "delete",
+                operation: "close",
                 type: "text",
                 label: "禁用",
                 icon: "",
                 // color: "blue",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
-                  return row.zt === "禁用";
+                  return row.siteState !== "禁用";
                 },
               },
             ],
@@ -314,35 +336,66 @@ export default {
       },
       pageObj: {
         position: "right", //分页组件位置
-        total: 10,
-        pageIndex: 1,
-        pageSize: 10,
+        total: 10, //总页数
+        pageIndex: 1, //当前页
+        pageSize: 10, //当前页容量
       },
       // 计费模式数据
-      JFMSList:[],
+      JFMSList: [],
       // 场地等级数据
-      CDDJList:[]
+      CDDJList: [],
     };
   },
   methods: {
     rowOperation(row, $index, now) {
-      console.log(row, now);
+      let data = [];
       switch (now) {
         case "edit":
-          console.log(row);
           this.eidtFrom = JSON.parse(JSON.stringify(row));
           this.dialogFormVisible = true;
           break;
-        case "":
+          // 清除容量
+        case "clearCu":
           this.dialogRlVisible = true;
-          this.rlFrom = JSON.parse(JSON.stringify(row));
+          this.rlFrom = JSON.parse(JSON.stringify(row));  
           break;
-        case "see":
+        // 解封
+        case "seejie":
+          data = {
+            field: "closeState",
+            primaryKey: row.id,
+            value: row.closeState === "已封场" ? 0 : 1,
+          };
+          this.disableSaveorUpade(data);
+          break;
+        // 封场
+        case "seeopen":
+          data = {
+            field: "closeState",
+            primaryKey: row.id,
+            value: row.closeState === "未封场" ? 1 : 0,
+          };
+          this.disableSaveorUpade(data);
           break;
         case "jfgz":
           this.$router.push("/site/cinema");
           break;
-        case "delet":
+          case "close":
+          data={
+            field:'siteState',
+            primaryKey:row.id,
+            value:1
+          }
+          this.disableSaveorUpade(data);
+          break;
+          // 禁用
+        case "open":
+          data={
+            field:'siteState',
+            primaryKey:row.id,
+            value:0
+          }
+          this.disableSaveorUpade(data);
           break;
         default:
           break;
@@ -351,21 +404,45 @@ export default {
     // 总页数发生改变
     handleSizeChange(e) {
       this.$emit("handleSizeChange", e);
+      console.log(e);
+      this.$set(this.pageObj, "pageSize", e);
+      const data = {
+        pageNum: this.pageObj.pageIndex,
+        pageSize: this.pageObj.pageSize,
+      };
+      this.getSiteLsit(data);
     },
     // 页码变化
     handleCurrentChange(e) {
       this.$emit("handleCurrentChange", e);
+      console.log(e);
+      this.$set(this.pageObj, "pageIndex", e);
+      const data = {
+        pageNum: this.pageObj.pageIndex,
+        pageSize: this.pageObj.pageSize,
+      };
+      this.getSiteLsit(data);
     },
     // 查询数据
     onSubmit() {
-      console.log(this.serchFrom);
-      if (this.serchFrom.zt !== undefined || this.serchFrom.name !== undefined) {
-        console.log("其中有一个不为空");
-        this.tableData = this.tableData.filter((item) => item.cdname === this.serchFrom.name || item.fctt === this.serchFrom.zt);
-      } else {
-        console.log("两个为空");
-        this.tableData = [...this.tableData];
+      let condition = [];
+      if (this.serchFrom.name && this.serchFrom.zt) {
+        condition = [
+          { column: "siteName", type: "like", value: this.serchFrom.name },
+          { column: " closeState", type: "eq", value: this.serchFrom.zt === "已包场" ? 1 : 0 },
+        ];
+      } else if (this.serchFrom.zt) {
+        condition = [{ column: " closeState", type: "eq", value: this.serchFrom.zt === "已包场" ? 1 : 0 }];
+      } else if (this.serchFrom.name) {
+        condition = [{ column: "siteName", type: "like", value: this.serchFrom.name }];
       }
+      console.log(condition);
+      const data = {
+        condition: JSON.stringify(condition),
+        pageSize: 10,
+        pageNum: 1,
+      };
+      this.getSiteLsit(data);
     },
     // 重置数据
     onSuReg() {
@@ -382,87 +459,97 @@ export default {
         if (res) {
           if (fromName === "addFrom") {
             console.log("新增呀");
-            const siteLevel=this.CDDJList.map(item=>{
-              if(item.codeValue===this.addFrom.siteLevel){
-                return  item.codeValue
+            const siteLevel = this.CDDJList.map((item) => {
+              if (item.codeText === this.addFrom.siteLevel) {
+                return item.codeValue;
               }
-            }).filter(item=>item).toString()
-            const billingMode=this.JFMSList.map(item=>{
-              if(item.codeValue===this.addFrom.siteLevel){
-                return  item.codeValue
+            })
+              .filter((item) => item)
+              .toString();
+            const billingMode = this.JFMSList.map((item) => {
+              if (item.codeText === this.addFrom.billingMode) {
+                return item.codeValue;
               }
-            }).filter(item=>item).toString()
+            })
+              .filter((item) => item)
+              .toString();
             const data = {
               siteName: this.addFrom.siteName,
               siteCapacity: this.addFrom.siteCapacity,
               siteLevel,
               billingMode,
-              blockBooking: this.addFrom.blockBooking === "是" ? 0 : 1,
+              blockBooking: this.addFrom.blockBooking === "是" ? 1 : 0,
               remark: this.addFrom.remark,
+              siteState: this.addFrom.siteState === "是" ? 1 : 0,
             };
             console.log(data);
             this.addSitelist(data);
-            this.addVisible=false
+            this.addVisible = false;
             console.log(data);
           } else if (fromName === "eidtFrom") {
-            const siteLevel=this.CDDJList.map(item=>{
-              if(item.codeValue===this.eidtFrom.siteLevel){
-                return  item.codeValue
+            const siteLevel = this.CDDJList.map((item) => {
+              if (item.codeText === this.eidtFrom.siteLevel) {
+                return item.codeValue;
               }
-            }).filter(item=>item).toString()
-            const data={
-              siteName:this.eidtFrom.siteName,
-              siteCapacity:this.eidtFrom.siteCapacity,
+            })
+              .filter((item) => item)
+              .toString();
+            const billingMode = this.JFMSList.map((item) => {
+              if (item.codeText === this.eidtFrom.billingMode) {
+                return item.codeValue;
+              }
+            })
+              .filter((item) => item)
+              .toString();
+            console.log(billingMode);
+            const data = {
+              id: this.eidtFrom.id,
+              siteName: this.eidtFrom.siteName,
+              siteCapacity: this.eidtFrom.siteCapacity,
               siteLevel,
-              billingMode:this.eidtFrom.billingMode,
-              blockBooking:this.eidtFrom.blockBooking ==='是'?0:1,
-              remark:this.eidtFrom.remark
-            }
-            console.log("修改呀",data);
-            this.updateSiteList(data)
-            this.dialogFormVisible=false
+              billingMode,
+              blockBooking: this.eidtFrom.blockBooking === "是" ? 1 : 0,
+              remark: this.eidtFrom.remark,
+              siteState: this.addFrom.siteState === "是" ? 1 : 0,
+            };
+            console.log("修改呀", data);
+            this.updateSiteList(data);
+            this.dialogFormVisible = false;
           }
         }
       });
     },
-    // 清楚新增/修改表单实例
+    // 清除新增/修改表单实例
     resetForm(fromName) {
-      if (fromName === "addfFrom") {
-        this.addVisible = false;
-      } else if (fromName === "editFrom") {
-        this.dialogFormVisible = false;
-      }
+      console.log(fromName);
+      this.$refs[fromName].resetFileds();
+      this.addVisible = false;
+      this.dialogFormVisible = false;
     },
     // 查询场地数据
-    getSiteLsit() {
-      Site.getPageList()
+    getSiteLsit(data = {}) {
+      Site.getPageList(data)
         .then((res) => {
           if (res.code === 200) {
-            let newData = res.data.records.map((item) => {
-              item.blockBooking === 1 ? (item.blockBooking = "是") : (item.blockBooking = "否");
+            this.tableData = res.data.records.map((item) => {
+              item.blockBooking === 0 ? (item.blockBooking = "是") : (item.blockBooking = "否");
               item.blockState === 0 ? (item.blockState = "未包场") : (item.blockState = "已包场");
               item.closeState === 0 ? (item.closeState = "未封场") : (item.closeState = "已封场");
-              item.flag === 0 ? (item.flag = "启用") : (item.flag = "禁用");
+              item.siteState === 0 ? (item.siteState = "启用") : (item.siteState = "禁用");
+              item.currentCapacity===null ? 0:item.currentCapacity;
+              for (const iterator of this.CDDJList) {
+                if (item.siteLevel === iterator.codeValue) {
+                  item.siteLevel = iterator.codeText;
+                }
+              }
+              for (const iterator of this.JFMSList) {
+                if (item.billingMode === iterator.codeValue) {
+                  item.billingMode = iterator.codeText;
+                }
+              }
               return item;
             });
-            console.log(this.tableData);
-            // this.tableData=newData.map(item=>{})
-            // 处理CDDJ
-           this.tableData= newData.map(items=>{
-              for (const item of this.CDDJList) {
-                  if(item.codeValue===items.siteLevel){
-                    return  item.codeText
-                  }
-            }
-            }).map(items=>{
-              for (const item of this.JFMSList) {
-                  if(item.codeValue===items.siteLevel){
-                    return  item.codeText
-                  }
-            }
-            })
-            // 处理计费模式
-
+            this.$set(this.pageObj, "total", res.data.total);
           }
         })
         .catch((err) => {
@@ -483,17 +570,19 @@ export default {
     // 查询字典表
     siteCode() {
       // CDDJ字典表
-      Allasig.siteCdCode().then(res=>{
-        if(res.code===200){
-          this.CDDJList=res.data
+      Allasig.siteCdCode().then((res) => {
+        if (res.code === 200) {
+          this.CDDJList = res.data;
+          console.log(this.CDDJList);
         }
-      })
+      });
       // 计费模式字典表
-      Allasig.siteCdCode({ codeValue: "JFMS" }).then(res=>{
-        if(res.code===200){
-          this.JFMSList=res.data
+      Allasig.siteCdCode({ codeValue: "JFMS" }).then((res) => {
+        if (res.code === 200) {
+          this.JFMSList = res.data;
+          console.log(this.JFMSList);
         }
-      })
+      });
     },
     // 修改管理数据
     updateSiteList(data) {
@@ -504,6 +593,34 @@ export default {
         }
       });
     },
+    // 清除容量/封场/禁用
+    async disableSaveorUpade(data) {
+      let save = await Site.updateFlid(data);
+      console.log(save);
+      if (save.code === 200) {
+        Message.success("修改成功");
+        this.getSiteLsit();
+      }
+    },
+    // 修改容量表单验证和取消
+    dis(fromName){
+      this.$refs[fromName].validate().then(res=>{
+        if(res){
+          const data={
+            field:'currentCapacity',
+            primaryKey:this.rlFrom.id,
+            value:this.rlFrom.value
+          }
+          console.log(data);
+          this.disableSaveorUpade(data)
+          this.dialogRlVisible=false
+        }
+      })
+    },
+    disEit(fromName){
+      this.$refs[fromName].resetFileds()
+      this.dialogRlVisible=false
+    }
   },
   created() {
     this.getSiteLsit();

@@ -79,7 +79,7 @@
  *
  */
 import commonTale from "@/components/common-table";
-import { Ispection } from "@/service/api/issue/ispection";
+import { Ispection } from "@/service/api/car/ispection";
 import { Message } from "element-ui";
 import { Site } from "@/service/api/site/site";
 import { formatDate } from "@/service/zdk/timeTime";

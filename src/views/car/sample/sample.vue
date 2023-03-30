@@ -26,7 +26,7 @@
 
 <script>
 import commonTale from "@/components/common-table";
-import { Sample } from "@/service/api/issue/sample";
+import { Sample } from "@/service/api/car/sample";
 export default {
   components: {
     commonTale,

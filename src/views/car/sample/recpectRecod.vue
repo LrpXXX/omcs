@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { Sample } from '@/service/api/issue/sample';
+import { Sample } from '@/service/api/car/sample';
 export default {
   data() {
     return {
@@ -68,7 +68,7 @@ export default {
       console.log(this.ruleForm);
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          
+          console.log(11);
         } else {
           console.log("error submit!!");
           return false;

@@ -28,8 +28,8 @@
     <!-- 新增 -->
     <el-dialog title="新增" :visible.sync="dialogFormVisible">
       <el-form :model="idFrom" :rules="idFromRul" ref="idFrom" label-width="150px">
-        <el-form-item label="终端编号" prop="caCode">
-          <el-input v-model="idFrom.caCode" placeholder="终端编号"></el-input>
+        <el-form-item label="终端编号" prop="terminalNumber">
+          <el-input v-model="idFrom.terminalNumber" placeholder="终端编号"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button @click="exitFrom('idFrom')">取消</el-button>
@@ -40,20 +40,17 @@
     <!-- 发放对讲机 -->
     <el-dialog title="发放对讲机" :visible.sync="openVisible">
       <el-form :model="openFrom" :rules="openRul" ref="openFrom" label-width="150px">
-        <el-form-item label="终端编号" prop="caCode">
-          <el-input v-model="openFrom.caCode" disabled></el-input>
+        <el-form-item label="终端编号" prop="terminalNumber">
+          <el-input v-model="openFrom.terminalNumber" disabled></el-input>
         </el-form-item>
-        <el-form-item label="发放车辆" prop="fhcar">
-          <el-input v-model="openFrom.fhcar"></el-input>
+        <el-form-item label="领用人员" prop="recipient">
+          <el-input v-model="openFrom.recipient"></el-input>
         </el-form-item>
-        <el-form-item label="领用人员" prop="lyName">
-          <el-input v-model="openFrom.khName"></el-input>
+        <el-form-item label="联系电话" prop="contactNumber">
+          <el-input v-model="openFrom.contactNumber"></el-input>
         </el-form-item>
-        <el-form-item label="联系电话" prop="tel">
-          <el-input v-model="openFrom.tel"></el-input>
-        </el-form-item>
-        <el-form-item label="发放时间" prop="time">
-          <el-date-picker v-model="openFrom.time" type="datetime" placeholder="选择日期时间"></el-date-picker>
+        <el-form-item label="发放时间" prop="issueTime">
+          <el-date-picker v-model="openFrom.issueTime" type="datetime" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
         <el-form-item>
           <el-button @click="resetForm('openFrom')">取消</el-button>
@@ -81,6 +78,9 @@
 
 <script>
 import commonTale from "@/components/common-table";
+import { InterPhone } from "@/service/api/issue/interPhone";
+import { formatDate } from "@/common/filters";
+import { Message } from "element-ui";
 export default {
   components: {
     commonTale,
@@ -98,7 +98,7 @@ export default {
         columnData: [
           {
             text: true,
-            prop: "zdId",
+            prop: "terminalNumber",
             label: "终端编号",
             align: "center",
             width: "150",
@@ -106,28 +106,28 @@ export default {
           },
           {
             text: true,
-            prop: "fhType",
+            prop: "issueState",
             label: "发放状态",
             align: "center",
             width: "100",
           },
           {
             text: true,
-            prop: "lyName",
+            prop: "recipient",
             label: "领用人员",
             align: "center",
             width: "300",
           },
           {
             text: true,
-            prop: "tel",
+            prop: "contactNumber",
             label: "联系电话",
             align: "center",
             width: "350",
           },
           {
             text: true,
-            prop: "time",
+            prop: "issueTime",
             label: "发放时间",
             width: "300",
             align: "center",
@@ -145,10 +145,8 @@ export default {
                 operation: "editOpen",
                 type: "text",
                 label: "发放",
-                // color: "red",
-                // eslint-disable-next-line no-unused-vars
-                isShow: (row, $index) => {
-                  return row.fhType === "未发放";
+                isShow: (row) => {
+                  return row.issueState === "未发放";
                 },
               },
               {
@@ -156,10 +154,8 @@ export default {
                 type: "text",
                 label: "收回",
                 icon: "",
-                // color: "blue",
-                // eslint-disable-next-line no-unused-vars
-                isShow: (row, $index) => {
-                  return row.fhType === "已发放";
+                isShow: (row) => {
+                  return row.issueState === "已发放";
                 },
               },
               {
@@ -167,9 +163,7 @@ export default {
                 type: "text",
                 label: "领取记录",
                 icon: "",
-                // color: "blue",
-                // eslint-disable-next-line no-unused-vars
-                isShow: (row, $index) => {
+                isShow: () => {
                   return true;
                 },
               },
@@ -203,14 +197,14 @@ export default {
       dialogFormVisible: false,
       idFrom: {},
       idFromRul: {
-        caCode: [{ required: true, message: "请输入通行卡物面ID", trigger: "blur" }],
+        terminalNumber: [{ required: true, message: "请输入设备编号", trigger: "blur" }],
       },
       openVisible: false,
       openFrom: {},
       openRul: {
-        tel: [{ required: true, message: "请选择车辆类型", trigger: "blur" }],
-        time: [{ required: true, message: "请选择发放时间", trigger: "change" }],
-        lyName: [{ required: true, message: "请填写领用人员", trigger: "blur" }],
+        contactNumber: [{ required: true, message: "请选择车辆类型", trigger: "blur" }],
+        issueTime: [{ required: true, message: "请选择发放时间", trigger: "change" }],
+        recipient: [{ required: true, message: "请填写领用人员", trigger: "blur" }],
       },
       closeVisible: false,
       closeFrom: {},
@@ -232,7 +226,7 @@ export default {
           this.openFrom = JSON.parse(JSON.stringify(row));
           break;
         case "see":
-            this.$router.push('/issue/interPhoneList')
+          this.$router.push("/issue/interPhoneList");
           break;
         default:
           break;
@@ -247,41 +241,83 @@ export default {
       this.$refs[fromName].resetFields();
       this.dialogFormVisible = false;
     },
+    // 新增模态框权限
     sureFrom(fromName) {
       this.$refs[fromName].validate().then((res) => {
-        this.idFrom;
-        console.log(this.idFrom.caCode);
         if (res) {
-          this.tableData.push({
-            zdId: this.idFrom.caCode,
-            fhType: "未发放",
-            lyName: undefined,
-            tel: undefined,
-            time: undefined,
-          });
+          const data = {
+            terminalNumber: this.idFrom.terminalNumber,
+          };
+          this.addInterPhone(data);
           this.dialogFormVisible = false;
         }
       });
     },
+    // 发放模态框确认
     submitForm(fromName) {
       this.$refs[fromName].validate().then((res) => {
-        this.openVisible = false;
+        if (res) {
+          const data = {
+            id: this.openFrom.id,
+            terminalNumber: this.openFrom.terminalNumber,
+            issueTime: formatDate(this.openFrom.issueTime),
+            recipient: this.openFrom.recipient,
+            contactNumber: this.openFrom.contactNumber,
+          };
+          this.updateById(data);
+          this.openVisible = false;
+        }
       });
     },
     resetForm(fromName) {
+      console.log(11111);
       this.$refs[fromName].resetFields();
-      this.openVisible = false;
+      // this.openVisible = false;
     },
     resetCloseForm(fromName) {
+      console.log(11);
       this.$refs[fromName].resetFields();
       this.closeVisible = false;
     },
     submitCloseForm(fromName) {
+      console.log(11);
       this.$refs[fromName].validate().then((res) => {
         this.closeVisible = false;
-        this.closeFrom={}
+        this.closeFrom = {};
       });
     },
+    // 新增对讲机数据
+    addInterPhone(data) {
+      InterPhone.addListPage(data).then((res) => {
+        if (res.code === 200) {
+          Message.success("新增对讲机终端编号成功");
+          this.getListInter();
+        }
+      });
+    },
+    // 查询对讲机数据
+    async getListInter(data) {
+      let res = await InterPhone.getListPage(data);
+      if (res.code === 200) {
+        this.tableData = res.data.records.map((item) => {
+          item.issueState === 0 ? (item.issueState = "未发放") : (item.issueState = "已发放");
+          return item;
+        });
+        this.$set(this.pageObj, "total", res.data.total);
+      }
+    },
+    // 根据ID修改数据
+   updateById(data) {
+      InterPhone.updateListPage(data).then(res=>{
+        if(res.code===200){
+          Message.success('发放成功')
+          this.getListInter()
+        }
+      })
+    },
+  },
+  created() {
+    this.getListInter();
   },
 };
 </script>

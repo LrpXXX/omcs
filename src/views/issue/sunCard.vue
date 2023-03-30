@@ -35,11 +35,11 @@
     <!-- 制卡 -->
     <el-dialog title="制卡" :visible.sync="dialogFormVisible">
       <el-form :model="idFrom" :rules="idFromRul" ref="idFrom" label-width="150px">
-        <el-form-item label="通行卡ID" prop="rfid">
+        <!-- <el-form-item label="通行卡ID" prop="rfid">
           <el-input v-model="idFrom.rfid" disabled placeholder="物面卡ID自动生成"></el-input>
-        </el-form-item>
-        <el-form-item label="物面卡号" prop="caCode">
-          <el-input v-model="idFrom.caCode" placeholder="填写通行卡物面卡号"></el-input>
+        </el-form-item> -->
+        <el-form-item label="物面卡号" prop="surfaceNumber">
+          <el-input v-model="idFrom.surfaceNumber" placeholder="填写通行卡物面卡号"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button @click="exitFrom('idFrom')">取消</el-button>
@@ -103,6 +103,8 @@
 
 <script>
 import commonTable from "@/components/common-table/index.vue";
+import { SunCard } from "@/service/api/issue/sunCard";
+import { Message } from "element-ui";
 export default {
   components: { commonTable },
   data() {
@@ -155,7 +157,7 @@ export default {
         columnData: [
           {
             text: true,
-            prop: "rfid",
+            prop: "physicalId",
             label: "通行卡ID",
             align: "center",
             width: "150",
@@ -163,21 +165,21 @@ export default {
           },
           {
             text: true,
-            prop: "IDcard",
+            prop: "surfaceNumber",
             label: "物面卡号",
             align: "center",
             width: "300",
           },
           {
             text: true,
-            prop: "idType",
+            prop: "issueState",
             label: "发放状态",
             align: "center",
             width: "150",
           },
           {
             text: true,
-            prop: "carType",
+            prop: "vehicleType",
             label: "车辆类型",
             width: "300",
             align: "center",
@@ -191,28 +193,28 @@ export default {
           },
           {
             text: true,
-            prop: "fhcar",
+            prop: "issueVehicle",
             label: "发放车辆",
             width: "200",
             align: "center",
           },
           {
             text: true,
-            prop: "lyName",
+            prop: "recipient",
             label: "领用人员",
             width: "200",
             align: "center",
           },
           {
             text: true,
-            prop: "tel",
+            prop: "contactNumber",
             label: "联系电话",
             width: "200",
             align: "center",
           },
           {
             text: true,
-            prop: "time",
+            prop: "issueTime",
             label: "发放时间",
             width: "200",
             align: "center",
@@ -234,7 +236,7 @@ export default {
                 // color: "red",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
-                  return row.idType === "未发放";
+                  return row.issueState === "未发放";
                 },
               },
               {
@@ -245,7 +247,7 @@ export default {
                 // color: "blue",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
-                  return row.idType === "已发放";
+                  return row.issueState === "已发放";
                 },
               },
             ],
@@ -260,10 +262,10 @@ export default {
       },
       dialogFormVisible: false,
       idFrom: {
-        caCode: "",
+        surfaceNumber: "",
       },
       idFromRul: {
-        caCode: [{ required: true, message: "请输入通行卡物面ID", trigger: "blur" }],
+        surfaceNumber: [{ required: true, message: "请输入通行卡物面ID", trigger: "blur" }],
       },
       closeFrom: {},
       closeRul: {
@@ -305,15 +307,16 @@ export default {
     onSubAdd() {
       this.dialogFormVisible = true;
     },
+    // 制卡确认按钮
     sureFrom(fromName) {
       console.log(this.$refs[fromName]);
       this.$refs[fromName].validate().then((res) => {
         if (res) {
-          this.tableData.push({
-            rfid: "tx20230" + this.tableData.length + 1,
-            IDcard: this.idFrom.caCode,
-            idType: "未发放",
-          });
+          const data = {
+            surfaceNumber: this.idFrom.surfaceNumber,
+          };
+          console.log(data);
+          this.addSunCard(data);
           this.dialogFormVisible = false;
         }
       });
@@ -324,6 +327,7 @@ export default {
     },
     sure(formName) {
       console.log("确定归还吗？");
+      console.log(this.closeFrom);
       this.$refs[formName].validate().then((res) => {
         if (res) {
           this.$refs[formName].resetFields();
@@ -344,6 +348,32 @@ export default {
       console.log(fromName);
       this.openVisible = false;
     },
+    // 获取通信卡数据
+    getListPage(data) {
+      SunCard.getListPage(data)
+        .then((res) => {
+          console.log(res);
+          this.tableData = res.data.records.map((item) => {
+            item.issueState === 0 ? (item.issueState = "未发放") : (item.issueState = "已发放");
+            return  item
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    // 获取
+    // 异步新增通信卡数据
+    async addSunCard(data) {
+      let res = await SunCard.addCard(data);
+      if (res.code === 200) {
+        Message.success("通行卡新增成功");
+        this.getListPage();
+      }
+    },
+  },
+  created() {
+    this.getListPage();
   },
 };
 </script>

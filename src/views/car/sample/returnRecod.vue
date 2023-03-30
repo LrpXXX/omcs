@@ -41,7 +41,7 @@
 
 <script>
 import reg from "@/common/reg";
-import { Sample } from "@/service/api/issue/sample";
+import { Sample } from "@/service/api/car/sample";
 export default {
   data() {
     return {

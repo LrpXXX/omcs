@@ -3,6 +3,7 @@ export const VUEXKEY = "SMART_VISUAL_VUEX";
 
 const prefix = "SMART_VISUAL_",
   TOKEN = `accessToken`,
+  REFRESHTOKEN = "refreshToken",
   LANG = `${prefix}LANG`,
   COMPANYINFO = `${prefix}COMPANYINFO`,
   MENUINFO = `${prefix}MENUINFO`,
@@ -32,7 +33,13 @@ const auth = {
   getToken: () => {
     return localStorage.getItem(TOKEN) || "";
   },
-
+  //设置刷新token
+  setRefreshToken:(token)=>{
+    localStorage.setItem(REFRESHTOKEN, token);
+  },
+  getRefreshToken: () => {
+    return localStorage.getItem(REFRESHTOKEN) || "";
+  },
   // 设置面包屑导航
   setBreadcrumb(route) {
     // 从面包屑跳转子页面的父级页面时，其父级页面可能是带有参数的，所以这里对meta中的parent字段进行再封装后传递

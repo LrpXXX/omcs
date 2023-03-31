@@ -82,6 +82,7 @@
 
 <script>
 import commonTale from "@/components/common-table";
+import { Devcise } from "@/service/api/issue/devcise";
 export default {
   components: { commonTale },
   data() {
@@ -94,51 +95,60 @@ export default {
         pageSize: 10,
       },
       tableData: [
-        { sbID: "123", zdId: "tx2023001", type: "在线", ffzt: "未发放", khname: "", lyname: "", tel: undefined, time: "" },
         {
-          sbID: "124",
-          zdId: "tx2023002",
-          type: "离线",
-          ffzt: "已发放",
+          equipmentNumber: "123",
+          equipmentId: "tx2023001",
+          onlineState: "在线",
+          issueState: "未发放",
+          khname: "",
+          recipient: "",
+          contactNumber: undefined,
+          issueTime: "",
+        },
+        {
+          equipmentNumber: "124",
+          equipmentId: "tx2023002",
+          onlineState: "离线",
+          issueState: "已发放",
           khname: "长安",
-          lyname: "赵武",
-          tel: 15736288040,
-          time: "2022-10-15 17:24:15",
+          recipient: "赵武",
+          contactNumber: 15736288040,
+          issueTime: "2022-10-15 17:24:15",
         },
         {
           sbID: "125",
-          zdId: "tx2023003",
-          type: "离线",
-          ffzt: "已发放",
+          equipmentId: "tx2023003",
+          onlineState: "离线",
+          issueState: "已发放",
           khname: "柳汽",
-          lyname: "王二",
-          tel: 13452364866,
-          time: "2023-03-01 08:45:36",
+          recipient: "王二",
+          contactNumber: 13452364866,
+          issueTime: "2023-03-01 08:45:36",
         },
       ],
       columObj: {
         columnData: [
           {
             text: true,
-            prop: "sbID",
+            prop: "equipmentNumber",
             label: "设备编号",
             align: "center",
           },
           {
             text: true,
-            prop: "zdId",
+            prop: "equipmentId",
             label: "定位设备ID",
             align: "center",
           },
           {
             text: true,
-            prop: "type",
+            prop: "onlineState",
             label: "在线状态",
             align: "center",
           },
           {
             text: true,
-            prop: "ffzt",
+            prop: "issueState",
             label: "发放状态",
             align: "center",
           },
@@ -150,19 +160,19 @@ export default {
           },
           {
             text: true,
-            prop: "lyname",
+            prop: "recipient",
             label: "领用人员",
             align: "center",
           },
           {
             text: true,
-            prop: "tel",
+            prop: "contactNumber",
             label: "联系电话",
             align: "center",
           },
           {
             text: true,
-            prop: "time",
+            prop: "issueTime",
             label: "发放时间",
             align: "center",
           },
@@ -181,7 +191,7 @@ export default {
                 // color: "red",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
-                  return row.ffzt === "未发放";
+                  return row.issueState === "未发放";
                 },
               },
               {
@@ -192,7 +202,7 @@ export default {
                 // color: "blue",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
-                  return row.ffzt === "已发放";
+                  return row.issueState === "已发放";
                 },
               },
               {
@@ -203,7 +213,7 @@ export default {
                 // color: "blue",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
-                  return row.ffzt === "已发放";
+                  return row.issueState === "已发放";
                 },
               },
               {
@@ -214,7 +224,7 @@ export default {
                 // color: "blue",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
-                  return row.ffzt === "未发放";
+                  return row.issueState === "未发放";
                 },
               },
             ],
@@ -240,7 +250,7 @@ export default {
     rowOperation(row, $index, now) {
       switch (now) {
         case "see":
-          this.$router.push('/issue/devciseList')
+          this.$router.push("/issue/devciseList");
           break;
         case "editClose":
           this.closeVisible = true;
@@ -281,6 +291,25 @@ export default {
       this.$refs[fromName].resetFields();
       this.closeVisible = false;
     },
+    //  获取定位设备数据
+    async getTableList(data) {
+      try {
+        const res = await Devcise.getFixedListPage(data);
+        if (res.code === 200) {
+          this.tableData = res.data.records.map((item) => {
+            item.onlineState === 0 ? (item.onlineState = "离线") : (item.onlineState = "在线");
+            item.issueState === 0 ? (item.issueState = "未发放") : (item.issueState = "已发放");
+            return item;
+          });
+          this.$set(this.pageObj, "total", res.data.total);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  },
+  created() {
+    this.getTableList();
   },
 };
 </script>

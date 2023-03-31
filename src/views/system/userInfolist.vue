@@ -345,12 +345,13 @@ export default {
       this.$emit("handleCurrentChange", e);
     },
   },
-   
+
 };
 </script>
 
 <style lang="scss">
 .search {
   margin: 10px auto;
+  white-space:nowrap;
 }
 </style>

@@ -36,12 +36,21 @@
         <el-button type="primary" @click="excl">导出</el-button>
       </el-form-item>
     </el-form>
-    <commonTale :pageObj="pageObj" :tableData="tableData" :columObj="columObj"></commonTale>
+    <commonTale
+      :pageObj="pageObj"
+      :tableData="tableData"
+      :columObj="columObj"
+      @handleSizeChange="handleSizeChange"
+      @handleCurrentChange="handleCurrentChange"
+    ></commonTale>
   </div>
 </template>
 
 <script>
 import commonTale from "@/components/common-table";
+import { InterPhone } from "@/service/api/issue/interPhone";
+import { formatDate } from "@/common/filters";
+import {exportFile} from "@/common/common";
 export default {
   components: {
     commonTale,
@@ -104,39 +113,38 @@ export default {
         columnData: [
           {
             text: true,
-            prop: "zdId",
+            prop: "terminalNumber",
             label: "设备编号",
             align: "center",
           },
           {
             text: true,
-            prop: "time",
+            prop: "occouredTime",
             label: "时间",
             align: "center",
-
             sortable: true,
           },
           {
             text: true,
-            prop: "type",
+            prop: "isReturn",
             label: "类型",
             align: "center",
           },
           {
             text: true,
-            prop: "name",
+            prop: "contactPerson",
             label: "领用/归还人员",
             align: "center",
           },
           {
             text: true,
-            prop: "tel",
+            prop: "contactNumber",
             label: "联系电话",
             align: "center",
           },
           {
             text: true,
-            prop: "khName",
+            prop: "customerName",
             label: "客户名称",
             align: "center",
           },
@@ -145,18 +153,96 @@ export default {
     };
   },
   methods: {
-    onSerch(){
-      console.log('搜索一下');
+    onSerch() {
+      let data = [];
+      if (this.formInline.time && this.formInline.type && this.formInline.lyname) {
+        data = {
+          pageSize: 10,
+          pageNum: 1,
+          startTime: formatDate(this.formInline.time[0]),
+          endTime: formatDate(this.formInline.time[1]),
+          isReturn: this.formInline.type === "发放" ? 1 : 0,
+          contactPerson: this.formInline.lyname,
+        };
+      } else if (this.formInline.type) {
+        data = {
+          pageSize: 10,
+          pageNum: 1,
+          isReturn: this.formInline.type === "发放" ? 1 : 0,
+          contactPerson: this.formInline.lyname,
+        };
+      } else if (this.formInline.time) {
+        data = {
+          pageSize: 10,
+          pageNum: 1,
+          startTime: formatDate(this.formInline.time[0]),
+          endTime: formatDate(this.formInline.time[1]),
+          contactPerson: this.formInline.lyname,
+        };
+      } else if (this.formInline.lyname) {
+        data = {
+          pageSize: 10,
+          pageNum: 1,
+          contactPerson: this.formInline.lyname,
+        };
+      }
+      this.getInterPhoneList(data);
+      this.formInline = {};
     },
     onSuReg() {
       console.log("搜索条件清空");
+      this.getInterPhoneList();
+      this.formInline = {};
     },
     goBack() {
       this.$router.push("/issue/interPhone");
     },
-    excl(){
-      console.log('导出excl文件');
-    }
+    //cha
+    excl() {
+      console.log("导出excl文件");
+     const  data=  exportFile('/system/sm-equipment-interphone/export')
+      console.log(data)
+    },
+    // 总页数发生改变
+    handleSizeChange(e) {
+      this.$emit("handleSizeChange", e);
+      console.log(e);
+      this.$set(this.pageObj, "pageSize", e);
+      const data = {
+        pageNum: this.pageObj.pageIndex,
+        pageSize: this.pageObj.pageSize,
+      };
+      this.getInterPhoneList(data);
+    },
+    // 页码变化
+    handleCurrentChange(e) {
+      this.$emit("handleCurrentChange", e);
+      console.log(e);
+      this.$set(this.pageObj, "pageIndex", e);
+      const data = {
+        pageNum: this.pageObj.pageIndex,
+        pageSize: this.pageObj.pageSize,
+      };
+      this.getInterPhoneList(data);
+    },
+    //  查询对讲机使用记录
+    async getInterPhoneList(data) {
+      try {
+        let res = await InterPhone.getWorkingRecordsList(data);
+        if (res.code === 200) {
+          this.tableData = res.data.records.map((item) => {
+            item.isReturn === 0 ? (item.isReturn = "发放") : (item.isReturn = "收回");
+            return item;
+          });
+          this.$set(this.pageObj, "total", res.data.total);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  },
+  created() {
+    this.getInterPhoneList();
   },
 };
 </script>

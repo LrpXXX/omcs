@@ -23,8 +23,9 @@ import "@/styles/element-variables.scss";
 import "@/styles/global.scss";
 // 导入lodsh组件库
 import _ from 'lodash'
+import RSA from'@/service/zdk/rsa'; //RSA加密
 Vue.prototype.$http = http;
-
+Vue.prototype.$rsa = RSA;
 Vue.config.productionTip = false;
 
 Vue.use(directive);

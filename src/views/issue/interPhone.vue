@@ -61,11 +61,11 @@
     <!-- 收回对讲机 -->
     <el-dialog title="收回对讲机" :visible.sync="closeVisible">
       <el-form :model="closeFrom" :rules="closeRul" ref="closeFrom" label-width="150px">
-        <el-form-item label="归还时间" prop="time">
-          <el-date-picker v-model="closeFrom.time" type="datetime" placeholder="选择日期时间"></el-date-picker>
+        <el-form-item label="归还时间" prop="issueTime">
+          <el-date-picker v-model="closeFrom.issueTime" type="datetime" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
-        <el-form-item label="归还人员" prop="khName">
-          <el-input v-model="closeFrom.khName"></el-input>
+        <el-form-item label="归还人员" prop="recipient">
+          <el-input v-model="closeFrom.recipient"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button @click="resetCloseForm('closeFrom')">取消</el-button>
@@ -209,8 +209,8 @@ export default {
       closeVisible: false,
       closeFrom: {},
       closeRul: {
-        time: [{ required: true, message: "请选择发放时间", trigger: "change" }],
-        khName: [{ required: true, message: "请填写归还人员", trigger: "blur" }],
+        issueTime: [{ required: true, message: "请选择发放时间", trigger: "change" }],
+        recipient: [{ required: true, message: "请填写归还人员", trigger: "blur" }],
       },
     };
   },
@@ -220,6 +220,9 @@ export default {
       switch (now) {
         case "editClose":
           this.closeVisible = true;
+          console.log(row.id)
+          this.closeFrom = JSON.parse(JSON.stringify(row));
+
           break;
         case "editOpen":
           this.openVisible = true;
@@ -258,32 +261,49 @@ export default {
       this.$refs[fromName].validate().then((res) => {
         if (res) {
           const data = {
-            id: this.openFrom.id,
-            terminalNumber: this.openFrom.terminalNumber,
-            issueTime: formatDate(this.openFrom.issueTime),
-            recipient: this.openFrom.recipient,
+            equipmentId: this.openFrom.id,
+            equipmentNumber: this.openFrom.terminalNumber,
+            occouredTime: formatDate(this.openFrom.issueTime),
+            contactPerson: this.openFrom.recipient,
             contactNumber: this.openFrom.contactNumber,
+            isReturn: 0,
+            bookingId: 1,
+            equipmentType: "对讲机",
           };
-          this.updateById(data);
+          this.getIusseOpen(data);
           this.openVisible = false;
         }
       });
     },
     resetForm(fromName) {
-      console.log(11111);
       this.$refs[fromName].resetFields();
-      // this.openVisible = false;
+      this.openVisible = false;
     },
+    //取消
     resetCloseForm(fromName) {
-      console.log(11);
       this.$refs[fromName].resetFields();
       this.closeVisible = false;
     },
+    //收回卡片信息数据
     submitCloseForm(fromName) {
       console.log(11);
       this.$refs[fromName].validate().then((res) => {
-        this.closeVisible = false;
-        this.closeFrom = {};
+        if (res) {
+          const data = {
+            equipmentId: this.closeFrom.id,
+            equipmentNumber: this.closeFrom.terminalNumber,
+            occouredTime: formatDate(this.closeFrom.issueTime),
+            contactPerson: this.closeFrom.recipient,
+            contactNumber: this.closeFrom.contactNumber,
+            isReturn: 1,
+            bookingId: 1,
+            equipmentType: "对讲机",
+            returnType: 1,
+          };
+          console.log(data)
+          this.getIusseClose(data);
+          this.closeVisible = false;
+        }
       });
     },
     // 新增对讲机数据
@@ -306,14 +326,29 @@ export default {
         this.$set(this.pageObj, "total", res.data.total);
       }
     },
-    // 根据ID修改数据
-   updateById(data) {
-      InterPhone.updateListPage(data).then(res=>{
-        if(res.code===200){
-          Message.success('发放成功')
-          this.getListInter()
+    // 根据ID进行发放设备
+    async getIusseOpen(data) {
+      try {
+        let res = await InterPhone.getIusse(data);
+        if (res.code === 200) {
+          Message.success("发放成功");
+          this.getListInter();
         }
-      })
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    // 根据ID对设备进行收回
+    async getIusseClose(data) {
+      try {
+        let res = await InterPhone.getIusseClose(data);
+        if (res.code === 200) {
+          Message.success("收回成功");
+          this.getListInter();
+        }
+      } catch (e) {
+        console.log(e);
+      }
     },
   },
   created() {

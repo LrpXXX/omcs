@@ -273,8 +273,8 @@ export const staticRoutes = [
         },
       },
       {
-        path: "/message/notifiction3",
-        component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/notifiction.vue"),
+        path: "/message/agreementMessage",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/agreementMessage.vue"),
         meta: {
           title: "协议管理",
           roles: [],

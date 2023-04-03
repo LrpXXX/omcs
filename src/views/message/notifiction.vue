@@ -5,8 +5,8 @@
       <el-form-item label="标题" prop="noticeTitle">
         <el-input v-model.trim="formInline.noticeTitle"></el-input>
       </el-form-item>
-      <el-form-item label="发放状态" prop="publishState">
-        <el-select v-model.trim="formInline.publishState" placeholder="发放状态">
+      <el-form-item label="发布状态" prop="publishState">
+        <el-select v-model.trim="formInline.publishState" placeholder="发布状态">
           <el-option label="全部" value="全部"></el-option>
           <el-option label="已发布" value="已发布"></el-option>
           <el-option label="未发布" value="未发布"></el-option>

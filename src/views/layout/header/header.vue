@@ -21,7 +21,7 @@
     <ul class="right-options flex ai-center">
       <li class="mr-30 cursor">
         <i class="el-icon-user mr-5"></i>
-        <span @click="toUserInfo">{{ userInfo.name || "默认" }}</span>
+        <span @click="toUserInfo">{{ userInfo.data.userName|| "默认" }}</span>
       </li>
       <li class="cursor">
         <i class="el-icon-switch-button mr-5"></i>
@@ -50,12 +50,13 @@ export default {
   data() {
     return {
       menuList: [],
-      userInfo: this.$store.state.user.userInfo,
+      userInfo: auth.getUserInfo('userName'),
     };
   },
   created() {
     // 进入页面获取一次面包屑
     this.getBreadcrumb();
+    console.log(this.userInfo)
   },
   methods: {
     // 触发左侧菜单的展开/收起事件

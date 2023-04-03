@@ -15,7 +15,6 @@
       </el-form-item>
       <el-form-item label="类型" prop="type">
         <el-select v-model.trim="formInline.type" placeholder="选择类型">
-          <el-option label="全部" value="全部"></el-option>
           <el-option label="发放" value="发放"></el-option>
           <el-option label="收回" value="收回"></el-option>
         </el-select>
@@ -50,7 +49,6 @@
 import commonTale from "@/components/common-table";
 import { InterPhone } from "@/service/api/issue/interPhone";
 import { formatDate } from "@/common/filters";
-import {exportFile} from "@/common/common";
 export default {
   components: {
     commonTale,
@@ -198,10 +196,11 @@ export default {
       this.$router.push("/issue/interPhone");
     },
     //cha
-    excl() {
+    async excl() {
       console.log("导出excl文件");
-     const  data=  exportFile('/system/sm-equipment-interphone/export')
-      console.log(data)
+      const data = this.tableData.map((item) => item.id);
+      const bebloe = await InterPhone.explie("/system/sm-equipment-interphone/export", data);
+      console.log(bebloe);
     },
     // 总页数发生改变
     handleSizeChange(e) {

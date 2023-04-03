@@ -26,8 +26,8 @@
     <!-- 发放设备 -->
     <el-dialog title="发放固定设备" :visible.sync="openVisible">
       <el-form :model="openFrom" :rules="openRul" ref="openFrom" label-width="150px">
-        <el-form-item label="通行卡ID" prop="rfid">
-          <el-input v-model="openFrom.rfid" disabled></el-input>
+        <el-form-item label="设备编号" prop="equipmentNumber">
+          <el-input v-model="openFrom.equipmentNumber" disabled></el-input>
         </el-form-item>
         <el-form-item label="车辆类型" prop="carType">
           <el-input v-model="openFrom.carType" placeholder="请输入车辆类型"></el-input>
@@ -38,14 +38,14 @@
         <el-form-item label="车辆VIN/底盘号" prop="carVIM">
           <el-input v-model="openFrom.carVIM"></el-input>
         </el-form-item>
-        <el-form-item label="客户名称" prop="khName">
-          <el-input v-model="openFrom.khName"></el-input>
+        <el-form-item label="客户名称" prop="customerName">
+          <el-input v-model="openFrom.customerName"></el-input>
         </el-form-item>
-        <el-form-item label="领用人员" prop="lyName">
-          <el-input v-model="openFrom.lyName"></el-input>
+        <el-form-item label="领用人员" prop="recipient">
+          <el-input v-model="openFrom.recipient"></el-input>
         </el-form-item>
-        <el-form-item label="联系电话" prop="tel">
-          <el-input v-model="openFrom.tel"></el-input>
+        <el-form-item label="联系电话" prop="contactNumber">
+          <el-input v-model="openFrom.contactNumber"></el-input>
         </el-form-item>
         <el-form-item label="发放时间" prop="time">
           <el-date-picker v-model="openFrom.time" type="datetime" placeholder="选择日期时间"></el-date-picker>
@@ -65,11 +65,11 @@
             <el-radio label="设备损坏"></el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="归还时间" prop="time">
-          <el-date-picker v-model="closeFrom.time" type="datetime" placeholder="选择日期时间"></el-date-picker>
+        <el-form-item label="归还时间" prop="issueTime">
+          <el-date-picker v-model="closeFrom.issueTime" type="datetime" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
-        <el-form-item label="归还人员" prop="lyName">
-          <el-input v-model="closeFrom.lyName" placeholder="输入归还人员"></el-input>
+        <el-form-item label="归还人员" prop="recipient">
+          <el-input v-model="closeFrom.recipient" placeholder="输入归还人员"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button @click="claer('sureFrom')">取消</el-button>
@@ -83,13 +83,16 @@
 <script>
 import commonTale from "@/components/common-table";
 import { Devcise } from "@/service/api/issue/devcise";
+import { InterPhone } from "@/service/api/issue/interPhone";
+import { formatDate } from "@/common/filters";
+import { Message } from "element-ui";
+
 export default {
   components: { commonTale },
   data() {
     return {
       formInline: {},
       pageObj: {
-        position: "right", //分页组件位置
         total: 20,
         pageIndex: 1,
         pageSize: 10,
@@ -100,7 +103,7 @@ export default {
           equipmentId: "tx2023001",
           onlineState: "在线",
           issueState: "未发放",
-          khname: "",
+          customerName: "",
           recipient: "",
           contactNumber: undefined,
           issueTime: "",
@@ -110,7 +113,7 @@ export default {
           equipmentId: "tx2023002",
           onlineState: "离线",
           issueState: "已发放",
-          khname: "长安",
+          customerName: "长安",
           recipient: "赵武",
           contactNumber: 15736288040,
           issueTime: "2022-10-15 17:24:15",
@@ -120,7 +123,7 @@ export default {
           equipmentId: "tx2023003",
           onlineState: "离线",
           issueState: "已发放",
-          khname: "柳汽",
+          customerName: "柳汽",
           recipient: "王二",
           contactNumber: 13452364866,
           issueTime: "2023-03-01 08:45:36",
@@ -154,7 +157,7 @@ export default {
           },
           {
             text: true,
-            prop: "khname",
+            prop: "customerName",
             label: "客户名称",
             align: "center",
           },
@@ -235,7 +238,7 @@ export default {
       openFrom: {},
       openRul: {
         fhcar: [{ required: true, message: "请选择归还类型", trigger: "change" }],
-        lyName: [{ required: true, message: "请输入归还人员", trigger: "blur" }],
+        contactPerson: [{ required: true, message: "请输入归还人员", trigger: "blur" }],
       },
       closeFrom: {},
       closeRul: {
@@ -254,6 +257,7 @@ export default {
           break;
         case "editClose":
           this.closeVisible = true;
+          this.closeFrom = JSON.parse(JSON.stringify(row));
           break;
         case "editOpen":
           this.openVisible = true;
@@ -265,25 +269,93 @@ export default {
       }
     },
     onSerch() {
-      console.log("你倒是搜索下东西");
+      console.log(this.formInline);
+      let condition = [];
+      if (this.formInline.rfid && this.formInline.ffzt && this.formInline.lyname) {
+        condition = [
+          { column: "equipmentNumber", type: "like", value: this.formInline.rfid },
+          { column: " issueState", type: "eq", value: this.formInline.ffzt === "已发放" ? 1 : 0 },
+          { column: "recipient", type: "like", value: this.formInline.lyname },
+        ];
+      } else if (this.formInline.ffzt) {
+        condition = [{ column: " issueState", type: "eq", value: this.formInline.ffzt === "已发放" ? 1 : 0 }];
+      } else if (this.formInline.rfid) {
+        condition = [{ column: "equipmentNumber", type: "like", value: this.formInline.rfid }];
+      } else if (this.formInline.lyname) {
+        condition = [{ column: "recipient", type: "like", value: this.formInline.lyname }];
+      }
+      console.log(condition);
+      const data = {
+        condition: JSON.stringify(condition),
+        pageSize: 10,
+        pageNum: 1,
+      };
+      this.getTableList(data);
+      this.formInline = {};
     },
     onSuReg() {
       this.formInline = {};
+      this.getTableList();
     },
     submitForm(fromName) {
       console.log(fromName);
-      this.openVisible = false;
+      console.log(this.openFrom);
+      // this.openVisible = false;
+      const data = {
+        equipmentId: this.openFrom.id,
+        equipmentNumber: this.openFrom.equipmentNumber,
+        occouredTime: formatDate(this.openFrom.issueTime),
+        contactPerson: this.openFrom.recipient,
+        contactNumber: this.openFrom.contactNumber,
+        isReturn: 0,
+        // contactName:this.openFrom.contactName,
+        bookingId: 1,
+        equipmentType: "定位设备",
+      };
+      console.log(data);
+      InterPhone.getIusse(data)
+        .then((res) => {
+          if (res.code == 200) {
+            Message.success("设备发放成功");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally((min) => {
+          this.openVisible = false;
+          this.getTableList();
+        });
     },
     resetForm(fromName) {
-      console.log(fromName);
+      this.$refs[fromName].resetFields();
       this.openVisible = false;
     },
     sure(formName) {
       console.log("确定归还吗？");
       this.$refs[formName].validate().then((res) => {
         if (res) {
-          this.$refs[formName].resetFields();
-          this.closeVisible = false;
+          console.log(this.closeFrom);
+          const data = {
+            equipmentId: this.closeFrom.id,
+            equipmentNumber: this.closeFrom.equipmentNumber,
+            occouredTime: formatDate(this.closeFrom.issueTime),
+            contactPerson: this.closeFrom.recipient,
+            contactNumber: this.closeFrom.contactNumber,
+            isReturn: 1,
+            bookingId: 1,
+            equipmentType: "定位设备",
+            returnType: this.closeFrom.type === "实验结束" ? 1 : 2,
+          };
+          console.log(data);
+          InterPhone.getIusseClose(data).then((res) => {
+            if (res.code === 200) {
+              Message.success("设备回收成功");
+              this.getTableList();
+              this.closeVisible = false;
+            }
+          });
+          // console.log(data)
         }
       });
     },

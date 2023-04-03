@@ -6,7 +6,6 @@
       </el-form-item>
       <el-form-item label="类型" prop="type">
         <el-select v-model.trim="formInline.type" placeholder="选择类型">
-          <el-option label="全部" value="全部"></el-option>
           <el-option label="发放" value="发放"></el-option>
           <el-option label="收回" value="收回"></el-option>
         </el-select>
@@ -39,12 +38,20 @@
         <el-button type="primary" @click="excl">导出</el-button>
       </el-form-item>
     </el-form>
-    <commonTale :pageObj="pageObj" :tableData="tableData" :columObj="columObj"></commonTale>
+    <commonTale
+      :pageObj="pageObj"
+      :tableData="tableData"
+      :columObj="columObj"
+      @handleSizeChange="handleSizeChange"
+      @handleCurrentChange="handleCurrentChange"
+    ></commonTale>
   </div>
 </template>
 
 <script>
 import commonTale from "@/components/common-table";
+import { Devcise } from "@/service/api/issue/devcise";
+import {formatDate} from "@/common/filters";
 export default {
   components: {
     commonTale,
@@ -99,27 +106,27 @@ export default {
         ],
       },
       tableData: [
-        { zdId: "1002",sbId:'tx2023001', time: "2015-09-31  15:31:02", type: "发放", name: "刘强", tel: 15736288040, khName: "中国长安" },
-        { zdId: "1002",sbId:'tx2023002', time: "2015-09-31  15:31:02", type: "发放", name: "", tel: undefined, khName: "中国汽研" },
-        { zdId: "1003", sbId:'tx2023003',time: "2018-09-31  15:31:02", type: "收回", name: "", tel: undefined, khName: "lims" },
+        { zdId: "1002", sbId: "tx2023001", time: "2015-09-31  15:31:02", type: "发放", name: "刘强", tel: 15736288040, khName: "中国长安" },
+        { zdId: "1002", sbId: "tx2023002", time: "2015-09-31  15:31:02", type: "发放", name: "", tel: undefined, khName: "中国汽研" },
+        { zdId: "1003", sbId: "tx2023003", time: "2018-09-31  15:31:02", type: "收回", name: "", tel: undefined, khName: "lims" },
       ],
       columObj: {
         columnData: [
           {
             text: true,
-            prop: "zdId",
+            prop: "equipmentNumber",
             label: "终端编号",
             align: "center",
           },
           {
             text: true,
-            prop: "sbId",
+            prop: "equipmentId",
             label: "设备Id",
             align: "center",
           },
           {
             text: true,
-            prop: "time",
+            prop: "occouredTime",
             label: "时间",
             align: "center",
 
@@ -127,25 +134,25 @@ export default {
           },
           {
             text: true,
-            prop: "type",
+            prop: "isReturn",
             label: "类型",
             align: "center",
           },
           {
             text: true,
-            prop: "name",
+            prop: "contactPerson",
             label: "领用/归还人员",
             align: "center",
           },
           {
             text: true,
-            prop: "tel",
+            prop: "contactNumber",
             label: "联系电话",
             align: "center",
           },
           {
             text: true,
-            prop: "khName",
+            prop: "customerName",
             label: "客户名称",
             align: "center",
           },
@@ -154,18 +161,105 @@ export default {
     };
   },
   methods: {
-    onSerch(){
-      console.log('搜索一下');
+    // 总页数发生改变
+    handleSizeChange(e) {
+      this.$emit("handleSizeChange", e);
+      console.log(e);
+      this.$set(this.pageObj, "pageSize", e);
+      const data = {
+        pageNum: this.pageObj.pageIndex,
+        pageSize: this.pageObj.pageSize,
+      };
+      this.getTableListt(data);
+    },
+    // 页码变化
+    handleCurrentChange(e) {
+      this.$emit("handleCurrentChange", e);
+      console.log(e);
+      this.$set(this.pageObj, "pageIndex", e);
+      const data = {
+        pageNum: this.pageObj.pageIndex,
+        pageSize: this.pageObj.pageSize,
+      };
+      this.getTableListt(data);
+    },
+    //模糊查询
+    onSerch() {
+      console.log("搜索一下");
+      let data = [];
+      if (this.formInline.time && this.formInline.type && this.formInline.lyname&&this.formInline.sbID) {
+        data = {
+          pageSize: 10,
+          pageNum: 1,
+          startTime: formatDate(this.formInline.time[0]),
+          endTime: formatDate(this.formInline.time[1]),
+          isReturn: this.formInline.type === "发放" ? 0 : 1,
+          contactPerson: this.formInline.lyname,
+          equipmentNumber:this.formInline.rfid
+        };
+      } else if (this.formInline.type) {
+        data = {
+          pageSize: 10,
+          pageNum: 1,
+          isReturn: this.formInline.type === "发放" ? 0 : 1,
+          contactPerson: this.formInline.lyname,
+        };
+      } else if (this.formInline.time) {
+        data = {
+          pageSize: 10,
+          pageNum: 1,
+          startTime: formatDate(this.formInline.time[0]),
+          endTime: formatDate(this.formInline.time[1]),
+          contactPerson: this.formInline.lyname,
+        };
+      } else if (this.formInline.lyname) {
+        data = {
+          pageSize: 10,
+          pageNum: 1,
+          contactPerson: this.formInline.lyname,
+        };
+      }else  if(this.formInline.sbID){
+        data={
+          equipmentNumber:this.formInline.sbID,
+          pageSize: 10,
+          pageNum: 1,
+        }
+      }
+      this.getTableListt(data)
+      this.formInline={}
     },
     onSuReg() {
       console.log("搜索条件清空");
+      this.formInline={}
+      this.getTableListt()
     },
     goBack() {
       this.$router.push("/issue/devcise");
     },
-    excl(){
-      console.log('导出excl文件');
-    }
+    excl() {
+      console.log("导出excl文件");
+    },
+    //  查看定位i设备使用情况
+    async getTableListt(data) {
+      try {
+        let res = await Devcise.getFixedUse(data);
+        if (res.code === 200) {
+          this.tableData = res.data.records.map(item=>{
+            item.isReturn===0?item.isReturn='发放':item.isReturn='收回'
+            return item
+          });
+          this.$set(this.pageObj, "total", res.data.total);
+        }
+      } catch (e) {
+        console.log("错误了");
+        console.log(e);
+      }
+    },
+  //  获取固定设备使用情况
+
+  },
+  created() {
+    this.getTableListt()
   },
 };
 </script>

@@ -3,7 +3,7 @@ import http from "@/service/http";
 export const Ispection = {
   /**
    * @param  data {pageNum,pageSize,...args}
-   *          
+   *
    *  @author  模糊查询和分页查询
    */
   ispectionList(data = { pageNum: 1, pageSize: 10,contactPerson:'',vehicleName:'',vehicleNumber:'' }) {
@@ -65,4 +65,5 @@ export const Ispection = {
       .then((res) => res)
       .catch((err) => err);
   },
+
 };

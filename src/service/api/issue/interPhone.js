@@ -1,4 +1,5 @@
 import http from "@/service/http";
+import {exportFile} from "@/common/common";
 
 export const InterPhone = {
   // 分页模糊查询
@@ -64,4 +65,8 @@ export const InterPhone = {
       .then((res) => res)
       .catch((err) => err);
   },
+// 导出数据
+  explie(data){
+    return  exportFile('/system/sm-equipment-interphone/export',data).then(res=>res).catch(err=>err)
+  }
 };

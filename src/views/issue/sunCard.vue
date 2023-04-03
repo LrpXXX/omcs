@@ -50,32 +50,32 @@
     <!-- 发放通行卡 -->
     <el-dialog title="发放通行证" :visible.sync="openVisible">
       <el-form :model="openFrom" :rules="openRul" ref="openFrom" label-width="150px">
-        <el-form-item label="通行卡ID" prop="rfid">
-          <el-input v-model="openFrom.rfid" disabled></el-input>
+        <el-form-item label="通行卡ID" prop="physicalId">
+          <el-input v-model="openFrom.physicalId" disabled></el-input>
         </el-form-item>
-        <el-form-item label="车辆类型" prop="carType">
-          <el-select v-model="openFrom.carType" placeholder="请选择车辆类型">
+        <el-form-item label="车辆类型" prop="vehicleType">
+          <el-select v-model="openFrom.vehicleType" placeholder="请选择车辆类型">
             <el-option label="试验样车" value="试验样车"></el-option>
             <el-option label="巡检车辆" value="巡检车辆"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="发放车辆" prop="fhcar">
-          <el-input v-model="openFrom.fhcar"></el-input>
+        <el-form-item label="发放车辆" prop="issueVehicle">
+          <el-input v-model="openFrom.issueVehicle"></el-input>
         </el-form-item>
         <el-form-item label="车辆VIN/底盘号" prop="carVIM">
           <el-input v-model="openFrom.carVIM"></el-input>
         </el-form-item>
-        <el-form-item label="客户名称" prop="khName">
-          <el-input v-model="openFrom.khName"></el-input>
+        <el-form-item label="客户名称" prop="contactName">
+          <el-input v-model="openFrom.contactName"></el-input>
         </el-form-item>
-        <el-form-item label="领用人员" prop="lyName">
-          <el-input v-model="openFrom.lyName"></el-input>
+        <el-form-item label="领用人员" prop="recipient">
+          <el-input v-model="openFrom.recipient"></el-input>
         </el-form-item>
-        <el-form-item label="联系电话" prop="tel">
-          <el-input v-model="openFrom.tel"></el-input>
+        <el-form-item label="联系电话" prop="contactNumber">
+          <el-input v-model="openFrom.contactNumber"></el-input>
         </el-form-item>
-        <el-form-item label="发放时间" prop="time">
-          <el-date-picker v-model="openFrom.time" type="datetime" placeholder="选择日期时间"></el-date-picker>
+        <el-form-item label="发放时间" prop="issueTime">
+          <el-date-picker v-model="openFrom.issueTime" type="datetime" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
         <el-form-item>
           <el-button @click="resetForm('openFrom')">取消</el-button>
@@ -105,6 +105,8 @@
 import commonTable from "@/components/common-table/index.vue";
 import { SunCard } from "@/service/api/issue/sunCard";
 import { Message } from "element-ui";
+import {InterPhone} from "@/service/api/issue/interPhone";
+import {formatDate} from "@/common/filters";
 export default {
   components: { commonTable },
   data() {
@@ -186,7 +188,7 @@ export default {
           },
           {
             text: true,
-            prop: "khName",
+            prop: "contactName",
             label: "客户名称",
             width: "200",
             align: "center",
@@ -286,9 +288,11 @@ export default {
     rowOperation(row, $index, now) {
       switch (now) {
         case "editOpen":
+          this.openFrom=JSON.parse(JSON.stringify(row))
           this.openVisible = true;
           break;
         case "eidtClose":
+          this.closeFrom=JSON.parse(JSON.stringify(row))
           this.closeVisible = true;
           break;
         default:
@@ -321,16 +325,30 @@ export default {
         }
       });
     },
+    //取消制卡表单确认
     exitFrom(fromName) {
-      // this.idFrom[fromName].resetFields();
+      this.idFrom[fromName].resetFields();
       this.dialogFormVisible = false;
     },
+    //归还通行卡
     sure(formName) {
       console.log("确定归还吗？");
       console.log(this.closeFrom);
       this.$refs[formName].validate().then((res) => {
         if (res) {
-          this.$refs[formName].resetFields();
+          console.log(this.closeFrom)
+          const   data={
+            equipmentId: this.closeFrom.id,
+            equipmentNumber: this.closeFrom.physicalId,
+            occouredTime: formatDate(this.closeFrom.issueTime),
+            contactPerson: this.closeFrom.recipient,
+            contactNumber: this.closeFrom.contactNumber,
+            isReturn: 1,
+            bookingId: 1,
+            equipmentType: "通行卡",
+            returnType: this.closeFrom.type === "实验结束" ? 1 : 2,
+          }
+          this.getIusseClose(data)
           this.closeVisible = false;
         }
       });
@@ -339,10 +357,26 @@ export default {
       this.$refs[fromName].resetFields();
       this.closeVisible = false;
     },
-    // 发放数据
+    // 发放通行卡数据
     submitForm(fromName) {
-      console.log(fromName);
-      this.openVisible = false;
+      this.$refs[fromName].validate().then((res) => {
+        if (res) {
+          const data = {
+            equipmentId: this.openFrom.id,
+            equipmentNumber: this.openFrom.physicalId,
+            occouredTime: formatDate(this.openFrom.issueTime),
+            contactPerson: this.openFrom.recipient,
+            contactNumber: this.openFrom.contactNumber,
+            isReturn: 0,
+            // contactName:this.openFrom.contactName,
+            bookingId: 1,
+            equipmentType: "通行卡",
+          };
+          this.getIusseOpen(data)
+          this.openVisible = false;
+        }
+      });
+
     },
     resetForm(fromName) {
       console.log(fromName);
@@ -369,6 +403,30 @@ export default {
       if (res.code === 200) {
         Message.success("通行卡新增成功");
         this.getListPage();
+      }
+    },
+    // 根据ID进行发放设备
+    async getIusseOpen(data) {
+      try {
+        let res = await InterPhone.getIusse(data);
+        if (res.code === 200) {
+          Message.success("通行卡发放成功");
+          this.getListPage();
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    // 根据ID对设备进行收回
+    async getIusseClose(data) {
+      try {
+        let res = await InterPhone.getIusseClose(data);
+        if (res.code === 200) {
+          Message.success("通行卡收回成功");
+          this.getListPage();
+        }
+      } catch (e) {
+        console.log(e);
       }
     },
   },

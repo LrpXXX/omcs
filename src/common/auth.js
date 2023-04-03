@@ -34,7 +34,7 @@ const auth = {
     return localStorage.getItem(TOKEN) || "";
   },
   //设置刷新token
-  setRefreshToken:(token)=>{
+  setRefreshToken: (token) => {
     localStorage.setItem(REFRESHTOKEN, token);
   },
   getRefreshToken: () => {
@@ -169,6 +169,7 @@ const auth = {
     localStorage.removeItem(BREADCRUMB);
     localStorage.removeItem(SIGN);
     localStorage.removeItem(VUEXKEY);
+    localStorage.removeItem(REFRESHTOKEN);
   },
 };
 

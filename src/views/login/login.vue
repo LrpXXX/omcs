@@ -66,7 +66,7 @@ export default {
             // 登录后先重置之前添加的路由，避免重复
             resetRouter();
             auth.setToken(res.data.accessToken)
-            auth.setRefreshToken(res.data.accessToken)
+            auth.setRefreshToken(res.data.refreshToken)
             auth.setUserInfo(res);
             this.$t.setSession('accessToken', res.data.accessToken)
             this.$t.setSession('refreshToken', res.data.refreshToken)

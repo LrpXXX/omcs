@@ -2,18 +2,18 @@
   <div>
     <!-- 顶部搜索栏 -->
     <el-form :model="formInline" :inline="true">
-      <el-form-item label="标题" prop="rfid">
-        <el-input v-model.trim="formInline.rfid"></el-input>
+      <el-form-item label="标题" prop="noticeTitle">
+        <el-input v-model.trim="formInline.noticeTitle"></el-input>
       </el-form-item>
-      <el-form-item label="发放状态" prop="ffzt">
-        <el-select v-model.trim="formInline.ffzt" placeholder="发放状态">
+      <el-form-item label="发放状态" prop="publishState">
+        <el-select v-model.trim="formInline.publishState" placeholder="发放状态">
           <el-option label="全部" value="全部"></el-option>
-          <el-option label="已发放" value="已发放"></el-option>
-          <el-option label="未发放" value="未发放"></el-option>
+          <el-option label="已发布" value="已发布"></el-option>
+          <el-option label="未发布" value="未发布"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="时间" prop="time">
-        <el-date-picker v-model="formInline.time" type="date" placeholder="选择日期"></el-date-picker>
+      <el-form-item label="时间" prop="publishTime">
+        <el-date-picker v-model="formInline.publishTime" type="date" placeholder="选择日期"></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSerch">查询</el-button>
@@ -152,10 +152,11 @@ export default {
     this.initNotifiction();
   },
   methods: {
-    initNotifiction() {
+    initNotifiction(condition) {
       let parmary = {
         pageNum: 1,
         pageSize: 20,
+        condition
       };
       notifiction
         .getNotificationByPage(parmary)
@@ -268,11 +269,46 @@ export default {
           });
         });
     },
-    onSerch() {},
-    onSuReg() {},
+    /**搜索 */
+    onSerch() {
+      console.log(this.formInline);
+      let condition = [];
+      if(this.formInline.noticeTitle != undefined && this.formInline.noticeTitle != ""){
+        let title = {
+          column: "notice_title",
+          type: "like",
+          value: this.formInline.noticeTitle
+        }
+        condition.push(title);
+      }
+      if(this.formInline.publishState != undefined && this.formInline.publishState != "" && this.formInline.publishState != "全部"){
+        let state = {
+          column: "publish_state",
+          type: "eq",
+          value: this.formInline.publishState=="未发布"?0:1
+        }
+        condition.push(state);
+      }
+      if(this.formInline.publishTime != undefined && this.formInline.publishTime != ""){
+        let time = {
+          column: "publish_time",
+          type: "ge",
+          value: this.formInline.publishTime
+        }
+        condition.push(time);
+      }
+      this.initNotifiction(JSON.stringify(condition));
+    },
+    /**重置搜索条件 */
+    onSuReg() {
+      this.formInline = {};
+      this.initNotifiction();
+    },
+    /**跳转到新增页面 */
     onAdd() {
       this.$router.push("/message/messageAdd");
     },
+    /**跳转到编辑页面 */
     onEdit(row) {
       this.$router.push({
                 path:'/message/messageAdd',

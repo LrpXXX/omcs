@@ -52,7 +52,7 @@ export default {
       }
       let userInfo = JSON.parse(auth.getUserInfo().data.userInfo);
       let data = {};
-      if (this.notificRow == undefined || this.notificRow == "") {
+      if (this.notificRow != undefined && this.notificRow != "") {
         data = this.notificRow;
         data.noticeTitle = this.noticeTitle;
         data.noticeContent = editor.getHtml();

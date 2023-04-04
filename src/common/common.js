@@ -33,7 +33,8 @@ export const exportFile = (url, params = {}) => {
       .post(url, params)
       .then((res) => {
         // 使用 URL.createObjectURL(new Blob([]))下载文件
-        let csvData = new Blob([res.data], { type: res.contentType }),
+        console.log(res)
+        let csvData = new Blob([res.data], { type: "application/vnd.ms-excel;charset=utf-8" }),
           fileName = decodeURI(res.fName);
         // for IE
         if (window.navigator && window.navigator.msSaveOrOpenBlob) {

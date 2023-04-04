@@ -10,7 +10,9 @@ Vue.use(Vuex);
 
 import user from "./modules/user";
 import { staticRoutes } from "@/router/routes";
-import { VUEXKEY } from "@/common/auth";
+import auth, {VUEXKEY} from "@/common/auth";
+
+
 
 export default new Vuex.Store({
   // vuex的插件配置
@@ -44,6 +46,7 @@ export default new Vuex.Store({
       state.menus = [];
       state.user.roles = [];
       state.user.userInfo = {};
+      auth.removeToken()
     },
   },
   actions: {

@@ -30,7 +30,7 @@ function isTokenExpire(serverTokenExpire) {
 }
 //配置拦截器白名单
 
-const   withList=['/sso/authenticate/login',`${process.env.VUE_APP_URL}sso/authenticate/refreshToken`]
+const   withList=["/sso/authenticate/login",`${process.env.VUE_APP_URL}sso/authenticate/refreshToken`]
 // 相应设置token
 axios.interceptors.request.use(
   (config) => {
@@ -42,6 +42,7 @@ axios.interceptors.request.use(
     //   return config;
     // }
     if(withList.includes(config.url)){
+      console.log('不是免登录嘛')
       return  config
     }else {
       // 自定义headers

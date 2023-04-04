@@ -81,6 +81,7 @@
 
 <script>
 import commonTale from "@/components/common-table/index.vue";
+import {Role} from "@/service/api/auth/role";
 export default {
   components: { commonTale },
   data() {
@@ -224,7 +225,7 @@ export default {
           this.saveVisible=true;
           this.ruleForm=JSON.parse(JSON.stringify(row))
           break;
-      
+
         default:
           break;
       }
@@ -234,8 +235,23 @@ export default {
     },
     resetForm(fromName){
       this.saveVisible=false
+    },
+  //  查询角色分页查询
+    async getTableList(data){
+      try {
+        const  res=await  Role.getList(data)
+        console.log(res)
+        if(res.code===200){
+          this.tableData=res.data.recounds
+        }
+      }catch (e) {
+        console.log(e)
+      }
     }
   },
+  created() {
+    this.getTableList()
+  }
 };
 </script>
 

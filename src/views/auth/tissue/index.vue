@@ -5,16 +5,14 @@
       <el-form-item label="组织名称" prop="rfid">
         <el-input v-model.trim="formInline.rfid"></el-input>
       </el-form-item>
-      <el-form-item label="组织类型" prop="ffzt">
-        <el-select v-model.trim="formInline.ffzt" placeholder="发放状态">
-          <el-option label="全部" value="全部"></el-option>
-          <el-option label="已发放" value="已发放"></el-option>
-          <el-option label="未发放" value="未发放"></el-option>
+      <el-form-item label="组织类型" prop="zt">
+        <el-select v-model.trim="formInline.zt" placeholder="发放状态">
+          <el-option label="外部" value="外部"></el-option>
+          <el-option label="内部" value="内部"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="状态" prop="ffzt">
         <el-select v-model.trim="formInline.ffzt" placeholder="发放状态">
-          <el-option label="全部" value="全部"></el-option>
           <el-option label="启用" value="启用"></el-option>
           <el-option label="禁用" value="禁用"></el-option>
         </el-select>
@@ -256,25 +254,63 @@ export default {
     rowOperation(row, $index, now) {
       switch (now) {
         case "editOpen":
-          this.openVisible = true;
-          for (const item of this.Tree) {
-            if (item.id === row.pid) {
-              row.pid = item.orgName;
-              break;
+          {
+            this.openVisible = true;
+            for (const item of this.Tree) {
+              if (item.id === row.pid) {
+                row.pid = item.orgName;
+                break;
+              }
             }
+            row.orgNumber === "启用" ? (row.orgNumber = "是") : (row.orgNumber = "否");
+            this.ruleForm = JSON.parse(JSON.stringify(row));
           }
-          row.orgNumber === "启用" ? (row.orgNumber = "是") : (row.orgNumber = "否");
-          this.ruleForm = JSON.parse(JSON.stringify(row));
           break;
         case "delet":
-          console.log(row)
+          {
+            const data = {
+              id: row.id,
+              orgNumber: row.orgNumber === "启用" ? 0 : 1,
+            };
+            this.tissueUpdate(data);
+          }
           break;
         default:
           break;
       }
     },
     onSerch() {
-      console.log(this.Tree);
+      let condition = [];
+      if (this.formInline.rfid && this.formInline.zt && this.formInline.ffzt) {
+        condition = [
+          { column: "orgName", type: "like", value: this.formInline.rfid },
+          { column: " orgSource", type: "eq", value: this.formInline.zt },
+          { column: "orgState", type: "eq", value: this.formInline.ffzt === "禁用" ? 0 : 1 },
+        ];
+      } else if (this.formInline.rfid && this.formInline.ffzt) {
+        condition = [
+          { column: "orgName", type: "like", value: this.formInline.rfid },
+          { column: "orgState", type: "eq", value: this.formInline.ffzt === "禁用" ? 0 : 1 },
+        ];
+      } else if (this.formInline.rfid && this.formInline.zt) {
+        condition = [
+          { column: " orgSource", type: "eq", value: this.formInline.zt },
+          { column: "orgName", type: "like", value: this.formInline.rfid },
+        ];
+      } else if (this.formInline.zt) {
+        condition = [{ column: " orgSource", type: "eq", value: this.formInline.zt }];
+      } else if (this.formInline.ffzt) {
+        condition = [{ column: "orgState", type: "eq", value: this.formInline.ffzt === "禁用" ? 0 : 1 }];
+      }
+      console.log(this.formInline);
+      const data = {
+        condition:JSON.stringify(condition),
+        pageNum: 1,
+        pageSize: 10,
+      };
+      console.log(data);
+      this.getTableList(data)
+      this.formInline={}
     },
     onSuReg() {
       this.getTableList();
@@ -361,7 +397,6 @@ export default {
       try {
         let res = await Tissue.tissueUpdate(data);
         if (res.code === 200) {
-          console.log(1111);
           Message.success("组织修改成功");
           this.getTableList();
         }

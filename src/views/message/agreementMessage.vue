@@ -2,14 +2,14 @@
   <div>
     <!-- 顶部搜索栏 -->
     <el-form :model="formInline" :inline="true">
-      <el-form-item label="协议名称" prop="title">
+      <el-form-item label="协议名称" prop="title" class="first-input">
         <el-input v-model.trim="formInline.title" placeholder="请输入标题"></el-input>
       </el-form-item>
       <el-form-item label="状态" prop="publishState">
         <el-select v-model.trim="formInline.publishState" placeholder="状态">
           <el-option label="全部" value="全部"></el-option>
-          <el-option label="已发布" value="已发布"></el-option>
-          <el-option label="未发布" value="未发布"></el-option>
+          <el-option label="已发布" value="1"></el-option>
+          <el-option label="未发布" value="0"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -33,7 +33,7 @@
     ></common-table>
     <el-dialog :title="this.agreeEntiy == '' ? '添加协议' : '编辑协议'" :visible.sync="openVislb">
       <el-card>
-        <agreement :agreeEntiy="agreeEntiy" @closeDialog="closeHandle"></agreement>
+        <agreement :agreeProp="agreeEntiy" @closeDialog="closeHandle"></agreement>
       </el-card>
     </el-dialog>
   </div>
@@ -43,6 +43,7 @@
 import agreement from "@/views/message/components/agreement.vue";
 import commonTable from "@/components/common-table/index.vue";
 import documentService from "@/service/api/message/document";
+import { isNumber } from '@/common/is';
 export default {
   components: { commonTable, agreement },
   data() {
@@ -59,10 +60,12 @@ export default {
             align: "center",
           },
           {
-            text: true,
-            prop: "content",
             label: "内容",
             align: "center",
+            ownDefinedRichText: true,
+            ownDefinedRichTextReturn: (row, $index) => {
+              return row.content;
+            }
           },
           {
             text: true,
@@ -125,10 +128,8 @@ export default {
         total: 20,
       },
       condition: [],
+      agreeEntiy: ""
     };
-  },
-  props: {
-    agreeEntiy: {},
   },
   created() {
     this.initAgreementMessage();
@@ -170,7 +171,10 @@ export default {
           this.$message.error(err);
         });
     },
-    onSerch() {
+    onSerch(pageIndex, pageSize) {
+      if (!isNumber(pageIndex)) {
+        this.pageObj.pageIndex = 1;
+      }
       if (this.formInline.title != undefined && this.formInline.title != "") {
         let title = {
           column: "title",
@@ -183,7 +187,7 @@ export default {
         let state = {
           column: "publish_state",
           type: "eq",
-          value: this.formInline.publishState === "未发布" ? 0 : 1,
+          value: this.formInline.publishState,
         };
         this.condition.push(state);
       }
@@ -197,6 +201,7 @@ export default {
     },
     onAdd() {
       this.openVislb = true;
+      this.agreeEntiy = "";
     },
     closeHandle() {
       this.openVislb = false;
@@ -207,6 +212,7 @@ export default {
     onEdit(row) {
       this.openVislb = true;
       this.agreeEntiy = row;
+      console.log(this.agreeEntiy);
     },
     /**草稿发布 */
     publish(row) {
@@ -287,16 +293,20 @@ export default {
     //页码变化
     handleCurrentChange(e) {
       this.pageObj.pageIndex = e;
-      this.onSerch();
+      this.onSerch(e, undefined);
     },
     //条数变化
     handleSizeChange(e) {
       this.pageObj.pageSize = e;
       this.pageObj.pageIndex = 1;
-      this.onSerch();
+      this.onSerch(1, e);
     },
   },
 };
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+  .first-input {
+    margin-left: 20px;
+  }
+</style>

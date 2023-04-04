@@ -22,14 +22,17 @@ export default {
   components: { Editor, Toolbar },
   data() {
     return {
-      noticeTitle: this.$route.query.notificRow.noticeTitle == undefined ? "" : this.$route.query.notificRow.noticeTitle,
+      noticeTitle: this.$route.query.notificRow == undefined ? "" : this.$route.query.notificRow.noticeTitle,
       notificRow: this.$route.query.notificRow == undefined ? "" : this.$route.query.notificRow,
       editor: null,
-      html: this.$route.query.notificRow.noticeContent == undefined ? "" : this.$route.query.notificRow.noticeContent,
+      html: this.$route.query.notificRow == undefined ? "" : this.$route.query.notificRow.noticeContent,
       toolbarConfig: {},
       editorConfig: { placeholder: "请输入内容..." },
       mode: "simple", // or 'simple'
     };
+  },
+  created() {
+    console.log(this.$route.query.notificRow);
   },
   methods: {
     // 创建wangEditor实例对象

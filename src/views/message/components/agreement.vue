@@ -67,13 +67,26 @@ export default {
       ],
     };
   },
+  props: ["agreeProp"],
   watch: {
-    agreeEntiy(cur, old) {
-      if (cur != undefined && cur != "" && cur != null) {
-        this.title = cur.title;
-        this.html = cur.content;
-        this.agreeRow = cur;
+    agreeProp:{
+      immediate: true,
+      handler(cur, old) {
+        if (cur != undefined && cur != "" && cur != null) {
+          this.seletFrom.state = cur.publishState;
+          this.seletFrom.client = cur.displayClinet;
+          this.title = cur.title;
+          this.html = cur.content;
+          this.agreeRow = cur;
+        }else{
+          this.seletFrom.state = "";
+          this.seletFrom.client = "";
+          this.title = "";
+          this.html = "";
+          this.agreeRow = "";
+        }
       }
+      
     },
   },
   methods: {
@@ -102,22 +115,28 @@ export default {
         data.title = this.title;
         data.content = editor.getHtml();
         data.publishState = this.seletFrom.state;
+        data.displayClinet = this.seletFrom.client;
       } else {
         data = {
           title: this.title,
           content: editor.getHtml(),
           publishPerson: userInfo.userName == undefined ? null : userInfo.userName,
           publishState: this.seletFrom.state,
+          displayClinet: this.seletFrom.client,
           aticleType: "2",
         };
       }
-      if (this.agreeRow != undefined && this.agreeRow != "") {
+      debugger;
+      if (this.agreeRow != undefined && this.agreeRow != "" && this.seletFrom.state != 1) {
         //编辑
         documentService
           .updateById(JSON.stringify(data))
           .then((res) => {
             if (res.code == 200) {
               this.$message.success("保存为草稿成功!");
+              this.title = "";
+              this.editor.setHtml("");
+              this.seletFrom = {};
             } else {
               this.$message.error("保存失败!");
             }
@@ -131,12 +150,15 @@ export default {
           .add(JSON.stringify(data))
           .then((result) => {
             if (result.code == 200) {
-              this.$message.success("保存为草稿成功!");
+              this.$message.success("发布成功!");
               this.title = "";
               this.editor.setHtml("");
+              this.seletFrom = {};
               return;
+            } else {
+              this.$message.error("发布失败!");
             }
-            this.$message.error("系统故障");
+          
           })
           .catch((err) => {
             this.$message.error(err);
@@ -146,8 +168,6 @@ export default {
     },
     /**取消 */
     cancel() {
-        // 重置数据
-
         this.$emit("closeDialog");
     },
     checkItemEmpty(editor) {

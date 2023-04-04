@@ -2,11 +2,11 @@
   <div>
     <!-- 顶部搜索栏 -->
     <el-form :model="formInline" :inline="true">
-      <el-form-item label="发布状态" prop="publishState">
+      <el-form-item label="发布状态" prop="publishState" class="first-input">
         <el-select v-model.trim="formInline.publishState" placeholder="发布状态">
           <el-option label="全部" value="全部"></el-option>
-          <el-option label="已发布" value="已发布"></el-option>
-          <el-option label="未发布" value="未发布"></el-option>
+          <el-option label="已发布" value="1"></el-option>
+          <el-option label="未发布" value="0"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="标题" prop="title">
@@ -58,10 +58,12 @@ export default {
             align: "center",
           },
           {
-            text: true,
-            prop: "content",
             label: "内容",
             align: "center",
+            ownDefinedRichText: true,
+            ownDefinedRichTextReturn: (row, $index) => {
+              return row.content;
+            }
           },
           {
             text: true,
@@ -123,11 +125,9 @@ export default {
         pageSize: 10,
         total: 20,
       },
-      condition: []
+      condition: [],
+      helpEntity: {}
     };
-  },
-  props:{
-      helpEntity:{}
   },
   created(){
     this.initHelpMessage();
@@ -169,7 +169,10 @@ export default {
           this.$message.error(err);
         });
     },
-    onSerch() {
+    onSerch(pageIndex, pageSize) {
+      if (!isNumber(pageIndex)) {
+        this.pageObj.pageIndex = 1;
+      }
       if(this.formInline.title != undefined && this.formInline.title != ""){
         let title = {
           column: "title",
@@ -182,7 +185,7 @@ export default {
         let state = {
           column: "publish_state",
           type: "eq",
-          value: this.formInline.publishState==="未发布"?0:1
+          value: this.formInline.publishState
         }
         this.condition.push(state);
       }
@@ -196,6 +199,7 @@ export default {
     },
     onAdd() {
       this.openVislb = true;
+      this.helpEntity = "";
     },
     closeHandle() {
       this.openVislb = false;
@@ -286,16 +290,20 @@ export default {
     //页码变化
     handleCurrentChange(e) {
       this.pageObj.pageIndex = e;
-      this.onSerch();
+      this.onSerch(e);
     },
     //条数变化
     handleSizeChange(e) {
       this.pageObj.pageSize = e;
       this.pageObj.pageIndex = 1;
-      this.onSerch();
+      this.onSerch(1, e);
     },
   },
 };
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+  .first-input {
+    margin-left: 20px;
+  }
+</style>

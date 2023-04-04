@@ -31,12 +31,21 @@ export default {
       helpRow: ""
     };
   },
+  props: ["helpEntity"],
   watch: {
-    helpEntity(cur, old) {
-      if (cur != undefined && cur != "" && cur != null) {
-        this.title = cur.title;
-        this.html = cur.content;
-        this.helpRow = cur;
+    helpEntity:{
+      immediate:true,
+      handler(cur, old) {
+        if (cur != undefined && cur != "" && cur != null) {
+          console.log("传值成功!");
+          this.title = cur.title;
+          this.html = cur.content;
+          this.helpRow = cur;
+        } else {
+          this.title = "";
+          this.html = "";
+          this.helpRow = "";
+        }
       }
     },
   },

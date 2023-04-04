@@ -25,7 +25,13 @@
         <el-button type="primary" @click="onAdd">新增</el-button>
       </el-form-item>
     </el-form>
-    <commonTale :tableData="tableData" :columObj="columObj" :pageObj="pageObj" @rowOperation="rowOperation"></commonTale>
+    <commonTale 
+      :tableData="tableData" 
+      :columObj="columObj" 
+      :pageObj="pageObj" 
+      @rowOperation="rowOperation"
+      @handleSizeChange="handleSizeChange"
+      @handleCurrentChange="handleCurrentChange"></commonTale>
     <!-- 查看通知公告模态框 -->
     <el-dialog title="查看详情" :visible.sync="openSee">
       <h1 style="text-align: center">{{ seeData.noticeTitle }}</h1>
@@ -73,9 +79,12 @@ export default {
           },
           {
             text: true,
-            prop: "publishState",
             label: "发布状态",
             align: "center",
+            ownDefined: true,
+            ownDefinedReturn: (row, $index) => {
+              return row.publishState===0?"草稿":"已发布";
+            },
           },
           {
             isOperation: true,
@@ -144,6 +153,8 @@ export default {
         ],
       },
       pageObj: {
+        pageIndex: 1,
+        pageSize: 10,
         total: 20,
       },
     };
@@ -154,8 +165,8 @@ export default {
   methods: {
     initNotifiction(condition) {
       let parmary = {
-        pageNum: 1,
-        pageSize: 20,
+        pageNum: this.pageObj.pageIndex,
+        pageSize: this.pageObj.pageSize,
         condition
       };
       notifiction
@@ -338,6 +349,17 @@ export default {
         default:
           break;
       }
+    },
+    //页码变化
+    handleCurrentChange(e) {
+      this.pageObj.pageIndex = e;
+      this.onSerch();
+    },
+    //条数变化
+    handleSizeChange(e) {
+      this.pageObj.pageSize = e;
+      this.pageObj.pageIndex = 1;
+      this.onSerch();
     },
   },
 };

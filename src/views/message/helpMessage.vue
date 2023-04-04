@@ -2,11 +2,15 @@
   <div>
     <!-- 顶部搜索栏 -->
     <el-form :model="formInline" :inline="true">
-      <el-form-item label="协议名称" prop="rfid">
-        <el-input v-model.trim="formInline.rfid" placeholder="请输入标题"></el-input>
+      <el-form-item label="发布状态" prop="publishState">
+        <el-select v-model.trim="formInline.publishState" placeholder="发布状态">
+          <el-option label="全部" value="全部"></el-option>
+          <el-option label="已发布" value="已发布"></el-option>
+          <el-option label="未发布" value="未发布"></el-option>
+        </el-select>
       </el-form-item>
-      <el-form-item label="" prop="desc">
-        <el-input v-model.trim="formInline.desc" placeholder="请输入关键字"></el-input>
+      <el-form-item label="标题" prop="title">
+        <el-input v-model.trim="formInline.title" placeholder="请输入标题"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSerch">查询</el-button>
@@ -19,20 +23,27 @@
       </el-form-item>
     </el-form>
     <!-- 表单列 -->
-    <common-table :table-data="tableData" :colum-obj="columObj" :page-obj="pageObj"></common-table>
-    <el-dialog title="编辑协议" :visible.sync="openVislb">
+    <common-table 
+      :table-data="tableData" 
+      :colum-obj="columObj" 
+      :page-obj="pageObj" 
+      @rowOperation="rowOperation"
+      @handleSizeChange="handleSizeChange"
+      @handleCurrentChange="handleCurrentChange"></common-table>
+    <el-dialog title="添加/编辑帮助" :visible.sync="openVislb">
         <el-card>
-            <message></message>
+            <helpDoc :helpEntity="helpEntity" @closeDialog="closeHandle"></helpDoc>
         </el-card>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import message from "@/views/message/components/message.vue"
+import helpDoc from "@/views/message/components/helpDoc.vue";
 import commonTable from "@/components/common-table/index.vue";
+import documentService from '@/service/api/message/document';
 export default {
-  components: { commonTable, message },
+  components: { commonTable, helpDoc },
   data() {
     return {
       openVislb: false,
@@ -42,22 +53,25 @@ export default {
           {
             text: true,
             prop: "title",
-            label: "协议名称",
+            label: "标题",
             width:"240",
             align: "center",
           },
           {
             text: true,
-            prop: "main",
-            label: "协议内容",
+            prop: "content",
+            label: "内容",
             align: "center",
           },
           {
             text: true,
-            prop: "type",
             label: "状态",
             width:"240",
             align: "center",
+            ownDefined: true,
+            ownDefinedReturn: (row, $index) => {
+              return row.publishState==0?"未发布":"已发布";
+            },
           },
           {
             isOperation: true,
@@ -68,17 +82,17 @@ export default {
             sortable: false,
             operation: [
               {
-                operation: "editOpen",
+                operation: "publish",
                 type: "text",
                 label: "发布",
                 // color: "red",
                 // eslint-disable-next-line no-unused-vars
                 isShow: (row, $index) => {
-                  return row.ffzt === "待发布";
+                  return row.publishState === 0;
                 },
               },
               {
-                operation: "see",
+                operation: "editOpen",
                 type: "text",
                 label: "编辑",
                 icon: "",
@@ -103,20 +117,182 @@ export default {
           },
         ],
       },
-      tableData: [
-        { id: 1, title: "安全协议", main: "协议一式两份,协议双方各执一份,具有同等效力。 甲方: 年月日 乙方: 年月日 2023年保密协议承诺书(精)三 甲方: 乙方: 根据国家有关法律法规,本着平等、自愿...协议一式两份,协议双方各执一份,具有同等效力。 甲方: 年月日 乙方: 年月日 2023年保密协议承诺书(精)三 甲方: 乙方: 根据国家有关法律法规,本着平等、自愿...", type: "待发布" },
-        { id: 2, title: "保密协议", main: "协议一式两份,协议双方各执一份,具有同等效力。 甲方: 年月日 乙方: 年月日 2023年保密协议承诺书(精)三 甲方: 乙方: 根据国家有关法律法规,本着平等、自愿...协议一式两份,协议双方各执一份,具有同等效力。 甲方: 年月日 乙方: 年月日 2023年保密协议承诺书(精)三 甲方: 乙方: 根据国家有关法律法规,本着平等、自愿...", type: "已发布" },
-      ],
+      tableData: [],
       pageObj: {
+        pageIndex: 1,
+        pageSize: 10,
         total: 20,
       },
+      condition: []
     };
   },
+  props:{
+      helpEntity:{}
+  },
+  created(){
+    this.initHelpMessage();
+  },
   methods: {
-    onSerch() {},
-    onSuReg() {},
+    initHelpMessage(condition) {
+      let aticleType = {
+          column: "aticle_type",
+          type: "eq",
+          value: 1
+      };
+      if(condition == undefined){
+        condition = [];
+        condition.push(aticleType);
+      }else{
+        condition.push(aticleType);
+      }
+      let parmary = {
+        pageNum: this.pageObj.pageIndex,
+        pageSize: this.pageObj.pageSize,
+        condition: JSON.stringify(condition)
+      };
+      documentService
+        .getDocumentByPage(parmary)
+        .then((res) => {
+          console.log(res);
+          if (res.code == 200) {
+            this.tableData = res.data.records;
+            this.pageObj = {
+              pageIndex: res.data.current,
+              pageSize: res.data.size,
+              total: res.data.total,
+            };
+          } else {
+            this.$message.error("系统故障!");
+          }
+        })
+        .catch((err) => {
+          this.$message.error(err);
+        });
+    },
+    onSerch() {
+      if(this.formInline.title != undefined && this.formInline.title != ""){
+        let title = {
+          column: "title",
+          type: "like",
+          value: this.formInline.title
+        }
+        this.condition.push(title);
+      }
+      if(this.formInline.publishState != undefined && this.formInline.publishState != "" && this.formInline.publishState != "全部"){
+        let state = {
+          column: "publish_state",
+          type: "eq",
+          value: this.formInline.publishState==="未发布"?0:1
+        }
+        this.condition.push(state);
+      }
+      this.initHelpMessage(this.condition);
+      // 重置条件数组
+      this.condition = [];
+    },
+    onSuReg() {
+      this.formInline = {};
+      this.initHelpMessage();
+    },
     onAdd() {
       this.openVislb = true;
+    },
+    closeHandle() {
+      this.openVislb = false;
+      // 关闭el-dialog,刷新表格
+      this.initHelpMessage();
+    },
+    /**打开编辑el-dialog */
+    onEdit(row) {
+      this.openVislb = true;
+      this.helpEntity = row;
+    },
+    /**草稿发布 */
+    publish(row) {
+      let that = this;
+      this.$confirm("是否确定发布该帮助文档?", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          row.publishState = 1;
+          documentService
+            .updateById(row)
+            .then((res) => {
+              if (res.code == 200) {
+                that.$message.success("发布成功!");
+                that.initHelpMessage();
+              } else {
+                that.$message.error("发布失败!");
+              }
+            })
+            .catch((err) => {
+              that.$message.error(err);
+            });
+        })
+        .catch(() => {
+          that.$message({
+            type: "info",
+            message: "已取消发布",
+          });
+        });
+    },
+    /**删除帮助文档 */
+    delete(row) {
+      let that = this;
+      this.$confirm("是否确定删除该帮助文档?", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          documentService
+            .deleteById(row.id)
+            .then((res) => {
+              if (res.code == 200) {
+                that.$message.success("删除帮助文档成功!");
+                that.initHelpMessage();
+              } else {
+                that.$message.error("删除失败!");
+              }
+            })
+            .catch((err) => {
+              that.$message.error(err);
+            });
+        })
+        .catch((err) => {
+          that.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+    rowOperation(row, $index, now) {
+      switch (now) {
+        case "editOpen":
+          this.onEdit(row);
+          break;
+        case "publish":
+          this.publish(row);
+          break;
+        case "delete":
+          this.delete(row);
+          break;
+        default:
+          break;
+      }
+    },
+    //页码变化
+    handleCurrentChange(e) {
+      this.pageObj.pageIndex = e;
+      this.onSerch();
+    },
+    //条数变化
+    handleSizeChange(e) {
+      this.pageObj.pageSize = e;
+      this.pageObj.pageIndex = 1;
+      this.onSerch();
     },
   },
 };

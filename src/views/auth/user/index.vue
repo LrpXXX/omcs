@@ -81,7 +81,8 @@
 
 <script>
 import commonTale from "@/components/common-table/index.vue";
-import {Role} from "@/service/api/auth/role";
+import {User} from "@/service/api/auth/user";
+import {decryptData} from "@/service/zdk/dataDES";
 export default {
   components: { commonTale },
   data() {
@@ -110,7 +111,7 @@ export default {
         columnData: [
           {
             text: true,
-            prop: "title",
+            prop: "userName",
             label: "姓名",
             align: "center",
           },
@@ -239,11 +240,10 @@ export default {
   //  查询角色分页查询
     async getTableList(data){
       try {
-        const  res=await  Role.getList(data)
-        console.log(res)
-        if(res.code===200){
-          this.tableData=res.data.recounds
-        }
+        const  res=await  User.getList(data)
+         const  data=decryptData(res)
+        console.log(data)
+
       }catch (e) {
         console.log(e)
       }

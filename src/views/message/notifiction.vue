@@ -2,14 +2,14 @@
   <div>
     <!-- 顶部搜索栏 -->
     <el-form :model="formInline" :inline="true">
-      <el-form-item label="标题" prop="noticeTitle">
+      <el-form-item label="标题" prop="noticeTitle" class="first-input">
         <el-input v-model.trim="formInline.noticeTitle"></el-input>
       </el-form-item>
       <el-form-item label="发布状态" prop="publishState">
         <el-select v-model.trim="formInline.publishState" placeholder="发布状态">
           <el-option label="全部" value="全部"></el-option>
-          <el-option label="已发布" value="已发布"></el-option>
-          <el-option label="未发布" value="未发布"></el-option>
+          <el-option label="已发布" value="1"></el-option>
+          <el-option label="草稿" value="0"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="时间" prop="publishTime">
@@ -25,11 +25,17 @@
         <el-button type="primary" @click="onAdd">新增</el-button>
       </el-form-item>
     </el-form>
-    <commonTale :tableData="tableData" :columObj="columObj" :pageObj="pageObj" @rowOperation="rowOperation"></commonTale>
+    <commonTale 
+      :tableData="tableData" 
+      :columObj="columObj" 
+      :pageObj="pageObj" 
+      @rowOperation="rowOperation"
+      @handleSizeChange="handleSizeChange"
+      @handleCurrentChange="handleCurrentChange"></commonTale>
     <!-- 查看通知公告模态框 -->
     <el-dialog title="查看详情" :visible.sync="openSee">
-      <h1 style="text-align: center">{{ seeData.noticeTitle }}</h1>
-      <p style="text-indent: 2em; margin-top: 10px">{{ seeData.noticeContent }}</p>
+      <h2 style="text-align: center">{{ seeData.noticeTitle }}</h2>
+      <div style="text-indent: 2em; margin-top: 20px" v-html="seeData.noticeContent"></div>
     </el-dialog>
   </div>
 </template>
@@ -54,10 +60,12 @@ export default {
             align: "center",
           },
           {
-            text: true,
-            prop: "noticeContent",
             label: "内容",
             align: "center",
+            ownDefinedRichText: true,
+            ownDefinedRichTextReturn: (row, $index) => {
+              return row.noticeContent;
+            }
           },
           {
             text: true,
@@ -73,9 +81,12 @@ export default {
           },
           {
             text: true,
-            prop: "publishState",
             label: "发布状态",
             align: "center",
+            ownDefined: true,
+            ownDefinedReturn: (row, $index) => {
+              return row.publishState===0?"草稿":"已发布";
+            },
           },
           {
             isOperation: true,
@@ -144,6 +155,8 @@ export default {
         ],
       },
       pageObj: {
+        pageIndex: 1,
+        pageSize: 10,
         total: 20,
       },
     };
@@ -154,8 +167,8 @@ export default {
   methods: {
     initNotifiction(condition) {
       let parmary = {
-        pageNum: 1,
-        pageSize: 20,
+        pageNum: this.pageObj.pageIndex,
+        pageSize: this.pageObj.pageSize,
         condition
       };
       notifiction
@@ -270,8 +283,10 @@ export default {
         });
     },
     /**搜索 */
-    onSerch() {
-      console.log(this.formInline);
+    onSerch(pageIndex, pageSize) {
+      if (!isNumber(pageIndex)) {
+        this.pageObj.pageIndex = 1;
+      }
       let condition = [];
       if(this.formInline.noticeTitle != undefined && this.formInline.noticeTitle != ""){
         let title = {
@@ -285,7 +300,7 @@ export default {
         let state = {
           column: "publish_state",
           type: "eq",
-          value: this.formInline.publishState=="未发布"?0:1
+          value: this.formInline.publishState
         }
         condition.push(state);
       }
@@ -339,8 +354,23 @@ export default {
           break;
       }
     },
+    //页码变化
+    handleCurrentChange(e) {
+      this.pageObj.pageIndex = e;
+      this.onSerch(e);
+    },
+    //条数变化
+    handleSizeChange(e) {
+      this.pageObj.pageSize = e;
+      this.pageObj.pageIndex = 1;
+      this.onSerch(1, e);
+    },
   },
 };
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+  .first-input {
+    margin-left: 20px;
+  }
+</style>

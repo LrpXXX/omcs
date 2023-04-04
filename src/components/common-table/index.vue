@@ -30,6 +30,8 @@
           <span v-if="column.text && column.editRow != $index">{{ row[column.prop] }}</span>
           <!-- 自定义内容 -->
           <span v-if="column.ownDefined">{{ column.ownDefinedReturn(row, $index) }}</span>
+          <!-- 自定义富文本内容 -->
+          <div v-if="column.ownDefinedRichText" v-html="column.ownDefinedRichTextReturn(row, $index)" style="height:50px;padding-top:5px"></div>
           <!-- switch开关 -->
           <el-switch
             v-if="column.switch"

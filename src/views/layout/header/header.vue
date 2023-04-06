@@ -50,7 +50,7 @@ export default {
   data() {
     return {
       menuList: [],
-      userInfo: auth.getUserInfo('userName'),
+      userInfo: auth.getUserInfo(),
     };
   },
   created() {
@@ -75,6 +75,7 @@ export default {
     // 退出登录
     loginOut() {
       auth.removeToken();
+      this.$t.delAllSession()
       this.$store.commit("LOGINOUT");
       this.$router.push("/login");
     },

@@ -8,64 +8,16 @@ const Layout = () => import("@/views/layout/index.vue"),
   Forget = () => import("@/views/login/forget.vue");
 // 任何角色都能访问的静态路由
 export const staticRoutes = [
-  // {
-  //   path: "/",
-  //   redirect: "/home",
-  //   component: Layout,
-  //   meta: {
-  //     title: "首页", // 页面标题
-  //   },
-  //   children: [
-  //     {
-  //       path: "/home",
-  //       component: Home,
-  //       meta: {
-  //         title: "首页", // 页面标题
-  //         icon: "", // 图标，一般配合菜单使用
-  //         roles: [], // RoleId 可以访问的角色ID
-  //         keepAlive: false, // boolean 是否开启页面缓存
-  //       },
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: "/monitor",
-  //   component: Layout,
-  //   meta: {
-  //     title: "实时监控", // 页面标题
-  //     icon: "", // 图标，一般配合菜单使用
-  //     roles: [], // RoleId 可以访问的角色ID
-  //     keepAlive: false, // boolean 是否开启页面缓存
-  //   },
-  //   children: [
-  //     {
-  //       path: "/monitor/monitorManage",
-  //       component: MonitorManage,
-  //       meta: {
-  //         title: "实时监控管理",
-  //         roles: [],
-  //       },
-  //     },
-  //     {
-  //       path: "/monitor/coalTemperature",
-  //       component: CoalTemperature,
-  //       meta: {
-  //         title: "高温报警检测",
-  //         roles: [],
-  //       },
-  //     },
-  //   ],
-  // },
   {
     path: "/",
-    redirect: "/system/userInfo",
+    redirect: "/omcs/system/userInfo",
     component: Layout,
     meta: {
       title: "预约管理",
     },
     children: [
       {
-        path: "/system/userInfo",
+        path: "/omcs/system/userInfo",
         component: () => import(/* webpackChunck 'userInfo' */ "@/views/system/user-info.vue"),
         meta: {
           title: "个人中心",
@@ -253,7 +205,8 @@ export const staticRoutes = [
         component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/editNotific.vue"),
         meta: {
           title: "新增/编辑公告",
-          roles: [],
+          hidden:true,
+          roles: []
         },
       },
       {
@@ -360,6 +313,24 @@ export const staticRoutes = [
         },
       ],
     },
+  {
+    path: '/bill',
+    component:Layout,
+    redirect: '/omcs/bill/billLsit',
+    meta: {
+      title: '账单管理',
+    },
+    children: [
+      {path:'/omcs/bill/billLsit',
+      component:()=>import(/* webpackChunck 'userInfo' */ "@/views/omcs/bill"),
+        meta: {
+        title: "账单列表",
+          hidden: true
+        }
+
+      }
+    ]
+  },
   {
     path: "/login",
     component: Login,

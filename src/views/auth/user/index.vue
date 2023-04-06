@@ -81,6 +81,8 @@
 
 <script>
 import commonTale from "@/components/common-table/index.vue";
+import {User} from "@/service/api/auth/user";
+import {decryptData} from "@/service/zdk/dataDES";
 export default {
   components: { commonTale },
   data() {
@@ -109,7 +111,7 @@ export default {
         columnData: [
           {
             text: true,
-            prop: "title",
+            prop: "userName",
             label: "姓名",
             align: "center",
           },
@@ -224,7 +226,7 @@ export default {
           this.saveVisible=true;
           this.ruleForm=JSON.parse(JSON.stringify(row))
           break;
-      
+
         default:
           break;
       }
@@ -234,8 +236,22 @@ export default {
     },
     resetForm(fromName){
       this.saveVisible=false
+    },
+  //  查询角色分页查询
+    async getTableList(data){
+      try {
+        const  res=await  User.getList(data)
+         const  data=decryptData(res)
+        console.log(data)
+
+      }catch (e) {
+        console.log(e)
+      }
     }
   },
+  created() {
+    this.getTableList()
+  }
 };
 </script>
 

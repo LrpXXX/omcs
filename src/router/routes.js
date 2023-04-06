@@ -300,15 +300,6 @@ export const staticRoutes = [
         },
       },
       {
-        path: "/auth/tissuesave",
-        component: () => import(/* webpackChunck 'userInfo' */ "@/views/auth/tissue/editFrom.vue"),
-        meta: {
-          title: "组织管理新增",
-          roles: [],
-          hidden:false
-        },
-      },
-      {
         path: "/auth/role",
         component: () => import(/* webpackChunck 'userInfo' */ "@/views/auth/role"),
         meta: {
@@ -317,10 +308,10 @@ export const staticRoutes = [
         },
       },
       {
-        path: "/auth/system",
-        component: () => import(/* webpackChunck 'userInfo' */ "@/views/auth/system"),
+        path: "/auth/user",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/auth/user"),
         meta: {
-          title: "系统配置",
+          title: "用户管理",
           roles: [],
         },
       },

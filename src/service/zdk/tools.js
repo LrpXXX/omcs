@@ -431,6 +431,36 @@ export default {
         fn.apply(context, args)
       }
     }
+  },
+  /**
+   * 深拷贝
+   * @param {*} obj 原对象
+   * @returns 返回的新对象
+   */
+  deepClone(obj) {
+    let objJsonString = JSON.stringify(obj);
+    return JSON.parse(objJsonString);
+  },
+  /**
+   * 数组转为以separator分割的字符串
+   * @param {*} array 数组
+   * @param {*} separator 分隔符
+   * @returns 
+   */
+  array2String(array, separator) {
+    let finalVal = "";
+    for (let index = 0; index < array.length; index++) {
+      
+      if (array.length == 1) {
+        finalVal = array[index];
+        continue;
+      }
+      if (index == array.length - 1) {
+        finalVal = finalVal + array[index];
+        continue;
+      }
+      finalVal = finalVal + array[index] + separator;
+    }
+    return finalVal;
   }
-
 }

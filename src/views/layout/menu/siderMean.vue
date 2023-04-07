@@ -13,7 +13,7 @@ export default {
       headeMean: [
           { id: "1", name: "数据展示中心", path: "/sjzs" },
           { id: "2", name: "监控指挥中心", path: "/jmmc" },
-          { id: "3", name: "运营管理中心", path: "/omsc" },
+          { id: "3", name: "运营管理中心", path: "/omcs" },
           { id: "4", name: "道路管理中心", path: "/dlgl" },
           { id: "5", name: "系统管理中心", path: "/xtgl" },
       ],

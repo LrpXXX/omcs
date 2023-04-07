@@ -354,7 +354,7 @@ export const staticRoutes = [
           path: "/config/loginBg",
           component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/loginBg"),
           meta: {
-            title: "登录地图配置",
+            title: "登录底图配置",
             roles: [],
           },
         },

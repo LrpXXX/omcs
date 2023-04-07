@@ -241,6 +241,7 @@ export default {
     async getTableList(data){
       try {
         const  res=await  User.getList(data)
+        console.log(res)
          const  data=decryptData(res)
         console.log(data)
 

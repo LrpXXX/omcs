@@ -30,14 +30,25 @@
       @handleSizeChange="handleSizeChange"
       @handleCurrentChange="handleCurrentChange"
     ></commonTable>
+    <el-dialog title="新增合并账单" :visible.sync="openVisible" width="80vw">
+      <!-- 关闭dialog弹窗 -->
+      <edit @onSerch="onserche" @closeDialog="closeHandle"></edit>
+    </el-dialog>
+    <el-dialog :visible.sync="seeVisible">
+      <eidt-name  @closeSeeDialog="closeSee"></eidt-name>
+  </el-dialog>
   </div>
 </template>
 
 <script>
 import commonTable from "@/components/common-table";
+import edit from "@/views/omcs/bill/components/edit.vue";
+import seeTable  from "@/views/omcs/bill/components/seeTable.vue"
 export default {
   components: {
     commonTable,
+    edit,
+    'eidt-name':seeTable
   },
   data() {
     return {
@@ -60,44 +71,52 @@ export default {
             align: "center",
           },
           {
+            text: true,
             prop: "main",
             label: "客户名称",
             align: "center",
           },
           {
+            text: true,
             prop: "main",
             label: "任务编号",
             align: "center",
           },
           {
+            text: true,
             prop: "main",
             label: "关联预约单数量",
             width: "80",
             align: "center",
           },
           {
+            text: true,
             prop: "main",
             label: "起止时间",
             align: "center",
           },
           {
+            text: true,
             prop: "main",
             label: "场地使用费（元）",
             width: "150",
             align: "center",
           },
           {
+            text: true,
             prop: "main",
             label: "固定设备使用费（元）",
             width: "180",
             align: "center",
           },
           {
+            text: true,
             prop: "main",
             label: "停车费（元）",
             align: "center",
           },
           {
+            text: true,
             prop: "main",
             label: "其他费用（元）",
             width: "150",
@@ -133,9 +152,49 @@ export default {
           },
         ],
       },
+      openVisible: false,
+      seeVisible: false,
     };
+  },
+  methods: {
+    rowOperation(row, $index, now) {
+      switch (now) {
+        case "editOpen":
+          this.seeVisible = true;
+          break;
+
+        default:
+          break;
+      }
+    },
+    handleSizeChange(e) {
+      console.log(e);
+      this.$set(this.pageObj, "pageSize", e);
+    },
+    handleCurrentChange(e) {
+      console.log(e);
+      this.$set(this.pageObj, "pageIndex", e);
+    },
+    onserche(pageNum = 1, pageSize = 10) {
+      console.log(pageNum, pageSize, "子组件调用二零嘛");
+    },
+    onAdd() {
+      this.openVisible = true;
+    },
+    onSuReg() {},
+    onSerch() {},
+    closeHandle() {
+      this.openVisible = false;
+    },
+    closeSee() {
+      this.seeVisible = false;
+    },
   },
 };
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.editForm {
+  width: 80vw;
+}
+</style>

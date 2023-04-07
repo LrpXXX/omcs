@@ -25,7 +25,7 @@
             </el-upload>
           </el-col>
           <el-col :span="12">
-            <div class="demo-image" v-if="appImgVisible" :key="appKey">
+            <div class="demo-image" v-if="appImgVisible">
               <el-image style="width: 150px; height: 150px" :src="appImageUrl" :key="appKey-1"></el-image>
               <span class="el-icon-error" @click="handleAppRemove"></span>
             </div>
@@ -33,7 +33,7 @@
         </el-row>
       </div>
     </el-card>
-    <el-card class="box-card" style="margin-top: 70px" :key="cardKey + 1">
+    <el-card class="box-card" style="margin-top: 70px">
       <div slot="header" class="clearfix">
         <span>pc端登录底图配置</span>
       </div>
@@ -59,8 +59,8 @@
             </el-upload>
           </el-col>
           <el-col :span="12">
-            <div class="demo-image" v-if="pcImgVisible" :key="pcKey">
-              <el-image style="width: 150px; height: 150px" :src="pcImageUrl" :key="pcKey+1"></el-image>
+            <div class="demo-image" v-if="pcImgVisible">
+              <el-image style="width: 150px; height: 150px" :src="pcImageUrl"></el-image>
               <span class="el-icon-error" @click="handlePcRemove"></span>
             </div>
           </el-col>
@@ -105,20 +105,23 @@ export default {
         .getLogBgList()
         .then((res) => {
           if (res.code == 200) {
+            const prefix = process.env.VUE_APP_URL.split(":")[0] + ":" + process.env.VUE_APP_URL.split(":")[1] + ":9876";
             res.data.forEach((element) => {
-              const prefix = process.env.VUE_APP_URL.split(":")[0] + ":" + process.env.VUE_APP_URL.split(":")[1] + ":9876";
               if (element.clientType == 1) {
                 this.appImageUrl = prefix + element.picUrl;
                 this.appImgVisible = true;
                 this.appEntity = element;
+                this.appLoginBgFile = "1";
               } else {
                 this.pcImageUrl = prefix + element.picUrl;
                 this.pcImgVisible = true;
                 this.pcEntity = element;
+                this.pcLoginBgFile = "1";
               }
             });
-            this.appKey = new Date().getUTCMilliseconds();
+            this.appKey = Date.now();
             this.pcKey = this.appKey + 1;
+            console.log(this);
           }
         })
         .catch((err) => {
@@ -154,40 +157,58 @@ export default {
       this.pcImageUrl = "";
     },
     async addOrUpdateAppIamge() {
-      if (this.appLoginBgFile == "" && this.appEntity != "") {
-        return true;
+      if (this.appLoginBgFile == "1"){
+        return new Promise((reslove, reject)=>{reslove(true)});
       }
       let appFd = new FormData();
       appFd.append("file", this.appLoginBgFile);
       let id = this.appEntity.id == undefined ? null : this.appEntity.id;
       let smConfigBackground = { id, clientType: "1" };
       appFd.append("smConfigBackground", new Blob([JSON.stringify(smConfigBackground)], { type: "application/json" }));
-      let res = logBgService.add(appFd);
-      if (res.code == 200) {
-        return true;
-      }
-      return false;
+      let res = await logBgService.add(appFd);
+      return new Promise((resolve, reject)=>{
+        if (res.code == 200) {
+          resolve(true);
+        }
+        resolve(false)
+      });
     },
     async addOrUpdatePcIamge() {
-      // if (this.pcLoginBgFile == "" && this.pcEntity != ""){
-      //   return true;
-      // }
+      if (this.pcLoginBgFile == "1"){
+        return new Promise((reslove, reject)=>{reslove(true)});
+      }
       let pcFd = new FormData();
       pcFd.append("file", this.pcLoginBgFile == "" ? null : this.pcLoginBgFile);
       let id = this.pcEntity.id == undefined ? null : this.pcEntity.id;
       let smConfigBackground = { id, clientType: "2" };
       pcFd.append("smConfigBackground", new Blob([JSON.stringify(smConfigBackground)], { type: "application/json" }));
       const res = await logBgService.add(pcFd);
-      if (res.code == 200) {
-        return true;
-      }
-      return false;
+      return new Promise((resolve, reject)=>{
+        if (res.code == 200) {
+          resolve(true);
+        }
+        resolve(false)
+      });
     },
-    save() {
+    async save() {
+      if (this.appLoginBgFile == "" && this.appEntity != "") {
+        this.$message.warning("请先上传小程序登录底图!");
+        return;
+      }
+      if (this.pcLoginBgFile == "" && this.pcEntity != ""){
+        this.$message.warning("请先上传PC端登录底图!");
+        return;
+      }
+      if(this.appLoginBgFile == "1" && this.pcLoginBgFile == "1") {
+        this.$message.success("保存成功!");
+        return;
+      }
       // 保存小程序登录底图
-      let appSave = this.addOrUpdateAppIamge();
+      let appSave = await this.addOrUpdateAppIamge();
       // 保存pc端登录底图
-      let pcSave = this.addOrUpdatePcIamge();
+      let pcSave = await this.addOrUpdatePcIamge();
+      console.log(appSave);
+      console.log(pcSave);
       if (appSave && pcSave) {
         this.$message.success("保存成功!");
         this.initLoginImage();

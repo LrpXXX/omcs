@@ -313,6 +313,33 @@ export const staticRoutes = [
         },
       ],
     },
+    // 系统日志
+    {
+      path: "/log",
+      component: Layout,
+      meta: {
+        title: "系统日志",
+        roles: [],
+      },
+      children: [
+        {
+          path: "/log/login",
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/log/login"),
+          meta: {
+            title: "登录日志",
+            roles: [],
+          },
+        },
+        {
+          path: "/log/operate",
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/log/operate"),
+          meta: {
+            title: "操作日志",
+            roles: [],
+          },
+        },
+      ],
+    },
   {
     path: '/bill',
     component:Layout,

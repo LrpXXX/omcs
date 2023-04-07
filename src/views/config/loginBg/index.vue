@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-card class="box-card" :key="cardKey">
+    <el-card class="box-card" style="margin-top:30px" :key="cardKey">
       <div slot="header" class="clearfix">
         <span>小程序登录底图配置</span>
       </div>
@@ -17,23 +17,23 @@
               list-type="picture"
               :limit="1"
               accept=".jpeg,.jpg,.pdf"
-              :disabled="appImgVisible==false?false:true"
+              :disabled="appImgVisible == false ? false : true"
             >
-              <el-button size="small" type="primary" :style="appImgVisible==false? '' : 'background-color: gray;'">上传图片</el-button>
+              <el-button size="small" type="primary" :style="appImgVisible == false ? '' : 'background-color: gray;'">上传图片</el-button>
               <div slot="tip" class="el-upload__tip">说明：允许上传.jpg .jpeg .pdf格式文件,不超过10M</div>
               <div slot="tip" class="el-upload__tip">图片尺寸：1000*1000</div>
             </el-upload>
           </el-col>
           <el-col :span="12">
             <div class="demo-image" v-if="appImgVisible">
-              <el-image style="width: 150px; height: 150px" :src="appImageUrl"></el-image>
+              <el-image style="width: 150px; height: 150px" :src="appImageUrl" :key="appKey-1"></el-image>
               <span class="el-icon-error" @click="handleAppRemove"></span>
             </div>
           </el-col>
         </el-row>
       </div>
     </el-card>
-    <el-card class="box-card" style="margin-top: 30px" :key="cardKey+1">
+    <el-card class="box-card" style="margin-top: 70px">
       <div slot="header" class="clearfix">
         <span>pc端登录底图配置</span>
       </div>
@@ -51,9 +51,9 @@
               list-type="picture"
               :limit="1"
               accept=".jpeg,.jpg,.pdf"
-              :disabled="pcImgVisible==false?false:true"
+              :disabled="pcImgVisible == false ? false : true"
             >
-              <el-button size="small" type="primary" :style="pcImgVisible==false? '' : 'background-color: gray;'">上传图片</el-button>
+              <el-button size="small" type="primary" :style="pcImgVisible == false ? '' : 'background-color: gray;'">上传图片</el-button>
               <div slot="tip" class="el-upload__tip">说明：允许上传.jpg .jpeg .pdf格式文件,不超过10M</div>
               <div slot="tip" class="el-upload__tip">图片尺寸：1000*1000</div>
             </el-upload>
@@ -67,15 +67,19 @@
         </el-row>
       </div>
     </el-card>
-    <div style="margin-top: 30px">
-      <el-button type="primary" @click="save">保存</el-button>
-      <el-button type="primary" plain @click="reset">取消</el-button>
-    </div>
+    <el-row type="flex" justify="center" style="margin-top:70px">
+      <el-col :span="8"></el-col>
+      <el-col :span="4">
+          <el-button type="primary" @click="save">保存</el-button>
+      </el-col>
+      <el-col :span="4"><el-button type="primary" plain @click="reset">取消</el-button></el-col>
+      <el-col :span="8"></el-col>
+    </el-row>
   </div>
 </template>
 
 <script>
-import logBgService from '@/service/api/config/logBg';
+import logBgService from "@/service/api/config/logBg";
 export default {
   data() {
     return {
@@ -88,6 +92,8 @@ export default {
       appLoginBgFile: "",
       pcLoginBgFile: "",
       cardKey: "",
+      appKey: "",
+      pcKey: "",
     };
   },
   created() {
@@ -95,25 +101,32 @@ export default {
   },
   methods: {
     initLoginImage() {
-      logBgService.getLogBgList()
-      .then((res) => {
-        if (res.code == 200){
-          res.data.forEach(element => {
+      logBgService
+        .getLogBgList()
+        .then((res) => {
+          if (res.code == 200) {
             const prefix = process.env.VUE_APP_URL.split(":")[0] + ":" + process.env.VUE_APP_URL.split(":")[1] + ":9876";
-            if(element.clientType == 1){
-              this.appImageUrl = prefix  + element.picUrl;
-              this.appImgVisible = true;
-              this.appEntity = element;
-            } else {
-              this.pcImageUrl = prefix + element.picUrl;
-              this.pcImgVisible = true;
-              this.pcEntity = element;
-            }
-          });
-        }
-      }).catch((err) => {
-        console.log(err);
-      })
+            res.data.forEach((element) => {
+              if (element.clientType == 1) {
+                this.appImageUrl = prefix + element.picUrl;
+                this.appImgVisible = true;
+                this.appEntity = element;
+                this.appLoginBgFile = "1";
+              } else {
+                this.pcImageUrl = prefix + element.picUrl;
+                this.pcImgVisible = true;
+                this.pcEntity = element;
+                this.pcLoginBgFile = "1";
+              }
+            });
+            this.appKey = Date.now();
+            this.pcKey = this.appKey + 1;
+            console.log(this);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     handleAppFileChange(file, fileList) {
       console.log(file);
@@ -137,53 +150,67 @@ export default {
       this.pcImgVisible = true;
       this.$refs.pcImgUpload.clearFiles(); //去掉文件列表
     },
-    handlePcFilePreview(file, fileList) {
-      console.log(file, fileList);
-    },
     // 移除PC端图片
     handlePcRemove(file) {
       this.pcLoginBgFile = "";
       this.pcImgVisible = false;
-      this.pcImageUrl = ""
+      this.pcImageUrl = "";
     },
     async addOrUpdateAppIamge() {
-      if (this.appLoginBgFile == "" && this.appEntity != ""){
-        return true;
+      if (this.appLoginBgFile == "1"){
+        return new Promise((reslove, reject)=>{reslove(true)});
       }
       let appFd = new FormData();
       appFd.append("file", this.appLoginBgFile);
-      let id = this.appEntity.id == undefined?null:this.appEntity.id;
-      let smConfigBackground = { id, clientType: "1"};
-      appFd.append("smConfigBackground", new Blob([JSON.stringify(smConfigBackground)], {type: "application/json"}));
-      let res = logBgService.add(appFd);
-      if (res.code == 200){
-        return true;
-      }
-      return false;
+      let id = this.appEntity.id == undefined ? null : this.appEntity.id;
+      let smConfigBackground = { id, clientType: "1" };
+      appFd.append("smConfigBackground", new Blob([JSON.stringify(smConfigBackground)], { type: "application/json" }));
+      let res = await logBgService.add(appFd);
+      return new Promise((resolve, reject)=>{
+        if (res.code == 200) {
+          resolve(true);
+        }
+        resolve(false)
+      });
     },
     async addOrUpdatePcIamge() {
-      if (this.pcLoginBgFile == "" && this.pcEntity != ""){
-        return true;
+      if (this.pcLoginBgFile == "1"){
+        return new Promise((reslove, reject)=>{reslove(true)});
       }
       let pcFd = new FormData();
-      pcFd.append("file", this.pcLoginBgFile);
-      let id = this.pcEntity.id == undefined?null:this.pcEntity.id;
-      let smConfigBackground = { id, clientType: "2"};
-      pcFd.append("smConfigBackground", new Blob([JSON.stringify(smConfigBackground)], {type: "application/json"}));
+      pcFd.append("file", this.pcLoginBgFile == "" ? null : this.pcLoginBgFile);
+      let id = this.pcEntity.id == undefined ? null : this.pcEntity.id;
+      let smConfigBackground = { id, clientType: "2" };
+      pcFd.append("smConfigBackground", new Blob([JSON.stringify(smConfigBackground)], { type: "application/json" }));
       const res = await logBgService.add(pcFd);
-      if (res.code == 200){
-        return true;
-      }
-      return false;
+      return new Promise((resolve, reject)=>{
+        if (res.code == 200) {
+          resolve(true);
+        }
+        resolve(false)
+      });
     },
-    save() {
-      
-        // 保存小程序登录底图
-      let appSave =  this.addOrUpdateAppIamge();
-        // 保存pc端登录底图
-      let pcSave =  this.addOrUpdatePcIamge();
+    async save() {
+      if (this.appLoginBgFile == "" && this.appEntity != "") {
+        this.$message.warning("请先上传小程序登录底图!");
+        return;
+      }
+      if (this.pcLoginBgFile == "" && this.pcEntity != ""){
+        this.$message.warning("请先上传PC端登录底图!");
+        return;
+      }
+      if(this.appLoginBgFile == "1" && this.pcLoginBgFile == "1") {
+        this.$message.success("保存成功!");
+        return;
+      }
+      // 保存小程序登录底图
+      let appSave = await this.addOrUpdateAppIamge();
+      // 保存pc端登录底图
+      let pcSave = await this.addOrUpdatePcIamge();
+      console.log(appSave);
+      console.log(pcSave);
       if (appSave && pcSave) {
-        this.$message.success("保存成功!")
+        this.$message.success("保存成功!");
         this.initLoginImage();
       } else {
         this.$message.error("系统故障!");
@@ -206,14 +233,14 @@ export default {
   width: 100px;
 }
 .demo-image {
-    width: 150px; 
-    height: 150px;
-    border-radius: 5px;
+  width: 150px;
+  height: 150px;
+  border-radius: 5px;
 }
 span.el-icon-error {
-    float:right;
-    position:relative;
-    top:-158px;
-    right:-5px
+  float: right;
+  position: relative;
+  top: -158px;
+  right: -5px;
 }
 </style>

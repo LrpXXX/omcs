@@ -276,13 +276,75 @@ export const staticRoutes = [
       },
     ],
   },
-  // 系统配置
-  {
-    path: "/config",
-    component: Layout,
-    meta: {
-      title: "系统配置",
-      roles: [],
+    // 系统配置
+    {
+      path: "/config",
+      component: Layout,
+      meta: {
+        title: "系统配置",
+        roles: [],
+      },
+      children: [
+        {
+          path: "/config/personnel",
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/personnel"),
+          meta: {
+            title: "人员配置",
+            roles: [],
+          },
+        },
+        {
+          path: "/config/car",
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/car"),
+          meta: {
+            title: "车辆配置",
+            roles: [],
+          },
+        },
+        {
+          path: "/config/fixed",
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/fixed"),
+          meta: {
+            title: "固设配置",
+            roles: [],
+          },
+        },
+        {
+          path: "/config/loginBg",
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/loginBg"),
+          meta: {
+            title: "登录底图配置",
+            roles: [],
+          },
+        },
+      ],
+    },
+    // 系统日志
+    {
+      path: "/log",
+      component: Layout,
+      meta: {
+        title: "系统日志",
+        roles: [],
+      },
+      children: [
+        {
+          path: "/log/login",
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/log/login"),
+          meta: {
+            title: "登录日志",
+            roles: [],
+          },
+        },
+        {
+          path: "/log/operate",
+          component: () => import(/* webpackChunck 'userInfo' */ "@/views/log/operate"),
+          meta: {
+            title: "操作日志",
+            roles: [],
+          },
+        },
+      ],
     },
     children: [
       {

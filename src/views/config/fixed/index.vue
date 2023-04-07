@@ -254,7 +254,7 @@ export default {
     handleSizeChange(e) {
       this.pageObj.pageSize = e;
       this.pageObj.pageIndex = 1;
-      this.onSerch(1, e);ruleForm
+      this.onSerch(1, e);
     },
     /** */
     submitForm(formName){

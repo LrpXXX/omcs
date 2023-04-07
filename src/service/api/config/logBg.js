@@ -14,16 +14,6 @@ const logBgService = {
             .then((res) => res)
             .catch((err) => err)
     },
-    updateById(data) {
-        return http.post(prefix + "/updateById", data)
-            .then((res) => res)
-            .catch((err) => err)
-    },
-    deleteById(id) {
-        return http.get(prefix + "/delId", { id })
-            .then((res) => res)
-            .catch((err) => err)
-    },
 }
 
 export default logBgService;

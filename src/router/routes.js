@@ -6,6 +6,12 @@ const Layout = () => import("@/views/layout/index.vue"),
   Login = () => import("@/views/login/login.vue"),
   NotFound = () => import("@/views/error/404.vue"),
   Forget = () => import("@/views/login/forget.vue");
+import DZGL from "@/views/road/barrier/dzgl";
+import JQLV from "@/views/road/barrier/jqlv";
+import JCLV from "@/views/road/barrier/jclv";
+import KGLV from "@/views/road/barrier/kglv";
+import NJYC from "@/views/road/barrier/njyc";
+
 // 任何角色都能访问的静态路由
 export const staticRoutes = [
   {
@@ -205,8 +211,8 @@ export const staticRoutes = [
         component: () => import(/* webpackChunck 'userInfo' */ "@/views/message/editNotific.vue"),
         meta: {
           title: "新增/编辑公告",
-          hidden:true,
-          roles: []
+          hidden: true,
+          roles: [],
         },
       },
       {
@@ -270,66 +276,66 @@ export const staticRoutes = [
       },
     ],
   },
-    // 系统配置
-    {
-      path: "/config",
-      component: Layout,
-      meta: {
-        title: "系统配置",
-        roles: [],
-      },
-      children: [
-        {
-          path: "/config/personnel",
-          component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/personnel"),
-          meta: {
-            title: "人员配置",
-            roles: [],
-          },
-        },
-        {
-          path: "/config/car",
-          component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/car"),
-          meta: {
-            title: "车辆配置",
-            roles: [],
-          },
-        },
-        {
-          path: "/config/fixed",
-          component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/fixed"),
-          meta: {
-            title: "固设配置",
-            roles: [],
-          },
-        },
-        {
-          path: "/config/loginBg",
-          component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/loginBg"),
-          meta: {
-            title: "登录地图配置",
-            roles: [],
-          },
-        },
-      ],
-    },
+  // 系统配置
   {
-    path: '/bill',
-    component:Layout,
-    redirect: '/omcs/bill/billLsit',
+    path: "/config",
+    component: Layout,
     meta: {
-      title: '账单管理',
+      title: "系统配置",
+      roles: [],
     },
     children: [
-      {path:'/omcs/bill/billLsit',
-      component:()=>import(/* webpackChunck 'userInfo' */ "@/views/omcs/bill"),
+      {
+        path: "/config/personnel",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/personnel"),
         meta: {
-        title: "账单列表",
-          hidden: true
-        }
-
-      }
-    ]
+          title: "人员配置",
+          roles: [],
+        },
+      },
+      {
+        path: "/config/car",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/car"),
+        meta: {
+          title: "车辆配置",
+          roles: [],
+        },
+      },
+      {
+        path: "/config/fixed",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/fixed"),
+        meta: {
+          title: "固设配置",
+          roles: [],
+        },
+      },
+      {
+        path: "/config/loginBg",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/config/loginBg"),
+        meta: {
+          title: "登录地图配置",
+          roles: [],
+        },
+      },
+    ],
+  },
+  {
+    path: "/bill",
+    component: Layout,
+    redirect: "/omcs/bill/billLsit",
+    meta: {
+      title: "账单管理",
+    },
+    children: [
+      {
+        path: "/omcs/bill/billLsit",
+        component: () => import(/* webpackChunck 'userInfo' */ "@/views/omcs/bill"),
+        meta: {
+          title: "账单列表",
+          hidden: true,
+        },
+      },
+    ],
   },
   {
     path: "/login",
@@ -347,6 +353,52 @@ export const staticRoutes = [
       title: "页面不存在",
       hidden: true,
     },
+  },
+
+  {
+    path: "/road",
+    redirect: "/road/barrier/gate",
+    component: Layout,
+    meta: {
+      title: "道闸管理",
+    },
+    children: [
+      {
+        path: "/road/barrier/gate",
+        component: DZGL,
+        meta: {
+          title: "道闸管理",
+        },
+      },
+      {
+        path: "/road/barrier/record",
+        component: JCLV,
+        meta: {
+          title: "进出记录",
+        },
+      },
+      {
+        path: "/road/barrier/switch",
+        component: KGLV,
+        meta: {
+          title: "开关记录",
+        },
+      },
+      {
+        path: "/road/barrier/jqlv",
+        component: JQLV,
+        meta: {
+          title: "鉴权记录",
+        },
+      },
+      {
+        path: "/road/barrier/njyc",
+        component: NJYC,
+        meta: {
+          title: "耐久异常",
+        },
+      },
+    ],
   },
 ];
 

@@ -100,7 +100,7 @@ router.beforeEach((to, from, next) => {
   } else if (to.path === "/login" || to.path === "/404") {
     next();
   } else {
-    //获取token
+    // 获取token
     const token = auth.getToken();
     if (token) {
       hasLogin({ router, to, next });

@@ -28,13 +28,9 @@ export default new Vuex.Store({
     user,
   },
   state: {
-    // 最终生成可访问的侧边导航菜单
-    menus: staticRoutes,
-    // 需要滚动在页面顶部的全局报警数据
-    warnList: [{ name: "" }],
-  },
-  getters: {
-    menus: (state) => state.menus,
+    collapsed: false,
+    topNavState: 'home',
+    leftNavState: 'home'  
   },
   mutations: {
     // 设置路由

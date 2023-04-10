@@ -1,41 +1,33 @@
-<template>
-  <el-container class="layout-container">
-    <!-- 全局左侧菜单 -->
-    <el-aside :width="asiderWidth" class="layout-aside">
-      <!-- 系统logo标识 -->
-      <div class="logo-wrap">
-        <p class="title">柳汽智慧场管理平台</p>
-      </div>
-      <!-- 菜单 -->
-      <layout-menu />
-    </el-aside>
 
-    <el-container>
-      <!-- 全局header -->
-      <el-header height="50px" class="layout-header-wrapper">
-        <layout-header :collapsed="isCollapse" @change="onChange" />
-      </el-header>
-
-      <!-- 全局实时监控滚动组件 -->
-      <div class="breadcrumb">
-        <el-breadcrumb separator="/">
-        <transition-group name="breadcrumb">
-          <el-breadcrumb-item v-for="(item, index) in menuList" :key="item.path">
-            <span v-if="index === menuList.length - 1">{{ item.meta.title }}</span>
-            <a v-else @click.prevent="onLink(item)">{{ item.meta.title }}</a>
-          </el-breadcrumb-item>
-        </transition-group>
-      </el-breadcrumb>
-      </div>
-       
-
-      <!-- 子页面容器 -->
-      <el-main>
-        <router-view />
-      </el-main>
-    </el-container>
-  </el-container>
+  <template>
+  <el-row class="container">
+    <!--头部-->
+    <el-col :span="24"><router-view name="top"></router-view></el-col>
+    <el-col :span="24" class="main">
+      <!--左侧导航-->
+      <router-view name="aside"></router-view>
+      <!--右侧内容区-->
+      <section class="content-container">
+        <div class="grid-content bg-purple-light">
+          <transition name="fade" mode="out-in">
+            <router-view></router-view>
+          </transition>
+        </div>
+      </section>
+    </el-col>
+  </el-row>
 </template>
+<script>
+  export default {
+    name: 'layout',
+    data () {
+      return {
+        loading: false
+      }
+    }
+  }
+</script>
+<!-- </template>
 
 <script>
 import menu from "./menu/menu.vue";
@@ -122,4 +114,4 @@ export default {
     border-radius: 4px;
   }
 }
-</style>
+</style> -->

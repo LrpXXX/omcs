@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :model="formInline" :inline="true">
+    <el-form :model="formInline" :inline="true" class="serchFrom">
       <el-form-item label="进出类型" prop="publishState">
         <el-select v-model.trim="formInline.publishState" placeholder="道闸状态">
           <el-option label="全部" value="全部"></el-option>
@@ -197,7 +197,8 @@ export default {
 .dilog {
   text-align: center;
 }
-.serch-right {
-  float: right;
+.serchFrom{
+  white-space: nowrap;
 }
+
 </style>

@@ -21,6 +21,8 @@ import "@/common/element-ui";
 import "@/styles/element-variables.scss";
 // 自定义元素样式
 import "@/styles/global.scss";
+// 挂载全局样式
+import "@/styles/style.css"
 // 导入lodsh组件库
 import _ from 'lodash'
 import RSA from'@/service/zdk/rsa'; //RSA加密
@@ -39,7 +41,9 @@ console.log(window.WebVideoCtrl);
 Object.keys(filters).forEach((item) => {
   Vue.filter(item, filters[item]);
 });
-
+Vue.component('footer-copyright', {
+  template: '<p class="footer-msg">©CopyRight 2016-2018 车车科技发展有限公司 版权所有 <a href="http://www.miibeian.gov.cn" target="_blank">粤ICP备******号</a></p>'
+});
 const app = new Vue({
   router,
   store,
